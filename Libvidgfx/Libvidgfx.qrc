@@ -1,0 +1,18 @@
+<RCC>
+  <qresource prefix="/Libvidgfx/">
+    <file>Resources/pci.ids</file>
+    <file>Shaders/hdyc-rgb-ps.cso</file>
+    <file>Shaders/resize-ps.cso</file>
+    <file>Shaders/resize-vs.cso</file>
+    <file>Shaders/rgb-nv16-ps.cso</file>
+    <file>Shaders/solid-ps.cso</file>
+    <file>Shaders/solid-vs.cso</file>
+    <file>Shaders/texDecal-ps.cso</file>
+    <file>Shaders/texDecal-vs.cso</file>
+    <file>Shaders/texDecalGbcs-ps.cso</file>
+    <file>Shaders/texDecalRgb-ps.cso</file>
+    <file>Shaders/uyvy-rgb-ps.cso</file>
+    <file>Shaders/yuy2-rgb-ps.cso</file>
+    <file>Shaders/yv12-rgb-ps.cso</file>
+  </qresource>
+</RCC>
