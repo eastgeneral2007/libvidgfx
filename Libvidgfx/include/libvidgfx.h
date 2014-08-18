@@ -180,10 +180,12 @@ LVG_EXPORT bool	initLibvidgfx_internal(
 class GraphicsContext;
 class Texture;
 class VertexBuffer;
+class TexDecalVertBuf;
 
 typedef GraphicsContext		VidgfxContext;
 typedef Texture				VidgfxTex;
-typedef VertexBuffer		VidgfxVertbuf;
+typedef VertexBuffer		VidgfxVertBuf;
+typedef TexDecalVertBuf		VidgfxTexDecalBuf;
 
 typedef GfxRenderTarget		VidgfxRendTarget;
 typedef GfxFilter			VidgfxFilter;
@@ -191,6 +193,104 @@ typedef GfxPixelFormat		VidgfxPixFormat;
 typedef GfxShader			VidgfxShader;
 typedef GfxTopology			VidgfxTopology;
 typedef GfxBlending			VidgfxBlending;
+
+//=============================================================================
+// VertexBuffer C interface
+
+//-----------------------------------------------------------------------------
+// Methods
+
+LVG_EXPORT float *vidgfx_vertbuf_get_data_ptr(
+	VidgfxVertBuf *buf);
+LVG_EXPORT int vidgfx_vertbuf_get_num_floats(
+	VidgfxVertBuf *buf);
+
+LVG_EXPORT void vidgfx_vertbuf_set_num_verts(
+	VidgfxVertBuf *buf,
+	int num_verts);
+LVG_EXPORT int vidgfx_vertbuf_get_num_verts(
+	VidgfxVertBuf *buf);
+LVG_EXPORT void vidgfx_vertbuf_set_vert_size(
+	VidgfxVertBuf *buf,
+	int vert_size);
+LVG_EXPORT int vidgfx_vertbuf_get_vert_size(
+	VidgfxVertBuf *buf);
+
+LVG_EXPORT void vidgfx_vertbuf_set_dirty(
+	VidgfxVertBuf *buf,
+	bool dirty = true);
+LVG_EXPORT bool vidgfx_vertbuf_is_dirty(
+	VidgfxVertBuf *buf);
+
+//=============================================================================
+// TexDecalVertBuf C interface
+
+//-----------------------------------------------------------------------------
+// Constructor/destructor
+
+LVG_EXPORT VidgfxTexDecalBuf *vidgfx_texdecalbuf_new(
+	VidgfxContext *context = NULL);
+LVG_EXPORT void vidgfx_texdecalbuf_destroy(
+	VidgfxTexDecalBuf *buf);
+
+//-----------------------------------------------------------------------------
+// Methods
+
+LVG_EXPORT void vidgfx_texdecalbuf_set_context(
+	VidgfxTexDecalBuf *buf,
+	VidgfxContext *context);
+LVG_EXPORT VertexBuffer *vidgfx_texdecalbuf_get_vert_buf(
+	VidgfxTexDecalBuf *buf); // Applies settings
+LVG_EXPORT GfxTopology vidgfx_texdecalbuf_get_topology(
+	VidgfxTexDecalBuf *buf);
+LVG_EXPORT void vidgfx_texdecalbuf_destroy_vert_buf(
+	VidgfxTexDecalBuf *buf);
+
+// Position
+LVG_EXPORT void vidgfx_texdecalbuf_set_rect(
+	VidgfxTexDecalBuf *buf,
+	const QRectF &rect);
+LVG_EXPORT QRectF vidgfx_texdecalbuf_get_rect(
+	VidgfxTexDecalBuf *buf);
+
+// Scrolling
+LVG_EXPORT void vidgfx_texdecalbuf_scroll_by(
+	VidgfxTexDecalBuf *buf,
+	const QPointF &delta);
+LVG_EXPORT void vidgfx_texdecalbuf_scroll_by(
+	VidgfxTexDecalBuf *buf,
+	float x_delta,
+	float y_delta);
+LVG_EXPORT void vidgfx_texdecalbuf_reset_scrolling(
+	VidgfxTexDecalBuf *buf);
+LVG_EXPORT void vidgfx_texdecalbuf_set_round_offset(
+	VidgfxTexDecalBuf *buf,
+	bool round);
+LVG_EXPORT bool vidgfx_texdecalbuf_get_round_offset(
+	VidgfxTexDecalBuf *buf);
+
+// Texture UV
+LVG_EXPORT void vidgfx_texdecalbuf_set_tex_uv(
+	VidgfxTexDecalBuf *buf,
+	const QPointF &top_left,
+	const QPointF &top_right,
+	const QPointF &bot_left,
+	const QPointF &bot_right);
+LVG_EXPORT void vidgfx_texdecalbuf_set_tex_uv(
+	VidgfxTexDecalBuf *buf,
+	const QRectF &norm_rect,
+	GfxOrientation orient = GfxUnchangedOrient);
+LVG_EXPORT void vidgfx_texdecalbuf_set_tex_uv(
+	VidgfxTexDecalBuf *buf,
+	const QPointF &top_left,
+	const QPointF &bot_right,
+	GfxOrientation orient = GfxUnchangedOrient);
+LVG_EXPORT void vidgfx_texdecalbuf_get_tex_uv(
+	VidgfxTexDecalBuf *buf,
+	QPointF *top_left,
+	QPointF *top_right,
+	QPointF *bot_left,
+	QPointF *bot_right);
 
 //=============================================================================
 // Texture C interface
@@ -242,11 +342,11 @@ LVG_EXPORT bool vidgfx_tex_is_srgb_hack(
 // Static methods
 
 LVG_EXPORT bool vidgfx_create_solid_rect(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QColor &col);
 LVG_EXPORT bool vidgfx_create_solid_rect(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QColor &tl_col,
 	const QColor &tr_col,
@@ -254,12 +354,12 @@ LVG_EXPORT bool vidgfx_create_solid_rect(
 	const QColor &br_col);
 
 LVG_EXPORT bool vidgfx_create_solid_rect_outline(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QColor &col,
 	const QPointF &half_width = QPointF(0.5f, 0.5f));
 LVG_EXPORT bool vidgfx_create_solid_rect_outline(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QColor &tl_col,
 	const QColor &tr_col,
@@ -268,14 +368,14 @@ LVG_EXPORT bool vidgfx_create_solid_rect_outline(
 	const QPointF &half_width = QPointF(0.5f, 0.5f));
 
 LVG_EXPORT bool vidgfx_create_tex_decal_rect(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect);
 LVG_EXPORT bool vidgfx_create_tex_decal_rect(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QPointF &br_uv);
 LVG_EXPORT bool vidgfx_create_tex_decal_rect(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QPointF &tl_uv,
 	const QPointF &tr_uv,
@@ -283,7 +383,7 @@ LVG_EXPORT bool vidgfx_create_tex_decal_rect(
 	const QPointF &br_uv);
 
 LVG_EXPORT bool vidgfx_create_resize_rect(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	float handle_size,
 	const QPointF &half_width = QPointF(0.5f, 0.5f));
@@ -379,12 +479,12 @@ LVG_EXPORT void vidgfx_context_flush(
 	VidgfxContext *context);
 
 // Buffers
-LVG_EXPORT VidgfxVertbuf *vidgfx_context_new_vertbuf(
+LVG_EXPORT VidgfxVertBuf *vidgfx_context_new_vertbuf(
 	VidgfxContext *context,
 	int size);
 LVG_EXPORT void vidgfx_context_destroy_vertbuf(
 	VidgfxContext *context,
-	VidgfxVertbuf *buf);
+	VidgfxVertBuf *buf);
 LVG_EXPORT VidgfxTex *vidgfx_context_new_tex(
 	VidgfxContext *context,
 	QImage img,
@@ -487,7 +587,7 @@ LVG_EXPORT void vidgfx_context_clear(
 	const QColor &color);
 LVG_EXPORT void vidgfx_context_draw_buf(
 	VidgfxContext *context,
-	VidgfxVertbuf *buf,
+	VidgfxVertBuf *buf,
 	int num_vertices = -1,
 	int start_vertex = 0);
 

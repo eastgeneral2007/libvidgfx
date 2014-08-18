@@ -105,6 +105,199 @@ bool initLibvidgfx_internal(int libVerMajor, int libVerMinor, int libVerPatch)
 }
 
 //=============================================================================
+// VertexBuffer C interface
+
+//-----------------------------------------------------------------------------
+// Methods
+
+float *vidgfx_vertbuf_get_data_ptr(
+	VidgfxVertBuf *buf)
+{
+	return buf->getDataPtr();
+}
+
+int vidgfx_vertbuf_get_num_floats(
+	VidgfxVertBuf *buf)
+{
+	return buf->getNumFloats();
+}
+
+void vidgfx_vertbuf_set_num_verts(
+	VidgfxVertBuf *buf,
+	int num_verts)
+{
+	buf->setNumVerts(num_verts);
+}
+
+int vidgfx_vertbuf_get_num_verts(
+	VidgfxVertBuf *buf)
+{
+	return buf->getNumVerts();
+}
+
+void vidgfx_vertbuf_set_vert_size(
+	VidgfxVertBuf *buf,
+	int vert_size)
+{
+	buf->setVertSize(vert_size);
+}
+
+int vidgfx_vertbuf_get_vert_size(
+	VidgfxVertBuf *buf)
+{
+	return buf->getVertSize();
+}
+
+void vidgfx_vertbuf_set_dirty(
+	VidgfxVertBuf *buf,
+	bool dirty)
+{
+	buf->setDirty(dirty);
+}
+
+bool vidgfx_vertbuf_is_dirty(
+	VidgfxVertBuf *buf)
+{
+	return buf->isDirty();
+}
+
+//=============================================================================
+// TexDecalVertBuf C interface
+
+//-----------------------------------------------------------------------------
+// Constructor/destructor
+
+VidgfxTexDecalBuf *vidgfx_texdecalbuf_new(
+	VidgfxContext *context)
+{
+	TexDecalVertBuf *vertBuf = new TexDecalVertBuf(context);
+	return static_cast<VidgfxTexDecalBuf *>(vertBuf);
+}
+
+void vidgfx_texdecalbuf_destroy(
+	VidgfxTexDecalBuf *buf)
+{
+	TexDecalVertBuf *vertBuf = static_cast<TexDecalVertBuf *>(buf);
+	if(vertBuf != NULL)
+		delete vertBuf;
+}
+
+//-----------------------------------------------------------------------------
+// Methods
+
+void vidgfx_texdecalbuf_set_context(
+	VidgfxTexDecalBuf *buf,
+	VidgfxContext *context)
+{
+	buf->setContext(context);
+}
+
+VertexBuffer *vidgfx_texdecalbuf_get_vert_buf(
+	VidgfxTexDecalBuf *buf)
+{
+	return buf->getVertBuf();
+}
+
+GfxTopology vidgfx_texdecalbuf_get_topology(
+	VidgfxTexDecalBuf *buf)
+{
+	return buf->getTopology();
+}
+
+void vidgfx_texdecalbuf_destroy_vert_buf(
+	VidgfxTexDecalBuf *buf)
+{
+	buf->deleteVertBuf();
+}
+
+// Position
+void vidgfx_texdecalbuf_set_rect(
+	VidgfxTexDecalBuf *buf,
+	const QRectF &rect)
+{
+	buf->setRect(rect);
+}
+
+QRectF vidgfx_texdecalbuf_get_rect(
+	VidgfxTexDecalBuf *buf)
+{
+	return buf->getRect();
+}
+
+// Scrolling
+void vidgfx_texdecalbuf_scroll_by(
+	VidgfxTexDecalBuf *buf,
+	const QPointF &delta)
+{
+	buf->scrollBy(delta);
+}
+
+void vidgfx_texdecalbuf_scroll_by(
+	VidgfxTexDecalBuf *buf,
+	float x_delta,
+	float y_delta)
+{
+	buf->scrollBy(x_delta, y_delta);
+}
+
+void vidgfx_texdecalbuf_reset_scrolling(
+	VidgfxTexDecalBuf *buf)
+{
+	buf->resetScrolling();
+}
+
+void vidgfx_texdecalbuf_set_round_offset(
+	VidgfxTexDecalBuf *buf,
+	bool round)
+{
+	buf->setRoundOffset(round);
+}
+
+bool vidgfx_texdecalbuf_get_round_offset(
+	VidgfxTexDecalBuf *buf)
+{
+	return buf->getRoundOffset();
+}
+
+// Texture UV
+void vidgfx_texdecalbuf_set_tex_uv(
+	VidgfxTexDecalBuf *buf,
+	const QPointF &top_left,
+	const QPointF &top_right,
+	const QPointF &bot_left,
+	const QPointF &bot_right)
+{
+	buf->setTextureUv(top_left, top_right, bot_left, bot_right);
+}
+
+void vidgfx_texdecalbuf_set_tex_uv(
+	VidgfxTexDecalBuf *buf,
+	const QRectF &norm_rect,
+	GfxOrientation orient)
+{
+	buf->setTextureUv(norm_rect, orient);
+}
+
+void vidgfx_texdecalbuf_set_tex_uv(
+	VidgfxTexDecalBuf *buf,
+	const QPointF &top_left,
+	const QPointF &bot_right,
+	GfxOrientation orient)
+{
+	buf->setTextureUv(top_left, bot_right, orient);
+}
+
+void vidgfx_texdecalbuf_get_tex_uv(
+	VidgfxTexDecalBuf *buf,
+	QPointF *top_left,
+	QPointF *top_right,
+	QPointF *bot_left,
+	QPointF *bot_right)
+{
+	buf->getTextureUv(top_left, top_right, bot_left, bot_right);
+}
+
+//=============================================================================
 // Texture C interface
 
 //-----------------------------------------------------------------------------
@@ -207,7 +400,7 @@ bool vidgfx_tex_is_srgb_hack(
 // Static methods
 
 bool vidgfx_create_solid_rect(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QColor &col)
 {
@@ -215,7 +408,7 @@ bool vidgfx_create_solid_rect(
 }
 
 bool vidgfx_create_solid_rect(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QColor &tl_col,
 	const QColor &tr_col,
@@ -227,7 +420,7 @@ bool vidgfx_create_solid_rect(
 }
 
 bool vidgfx_create_solid_rect_outline(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QColor &col,
 	const QPointF &half_width)
@@ -237,7 +430,7 @@ bool vidgfx_create_solid_rect_outline(
 }
 
 bool vidgfx_create_solid_rect_outline(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QColor &tl_col,
 	const QColor &tr_col,
@@ -250,14 +443,14 @@ bool vidgfx_create_solid_rect_outline(
 }
 
 bool vidgfx_create_tex_decal_rect(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect)
 {
 	return GraphicsContext::createTexDecalRect(out_buf, rect);
 }
 
 bool vidgfx_create_tex_decal_rect(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QPointF &br_uv)
 {
@@ -265,7 +458,7 @@ bool vidgfx_create_tex_decal_rect(
 }
 
 bool vidgfx_create_tex_decal_rect(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QPointF &tl_uv,
 	const QPointF &tr_uv,
@@ -277,7 +470,7 @@ bool vidgfx_create_tex_decal_rect(
 }
 
 bool vidgfx_create_resize_rect(
-	VidgfxVertbuf *out_buf,
+	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	float handle_size,
 	const QPointF &half_width)
@@ -472,7 +665,7 @@ void vidgfx_context_flush(
 	context->flush();
 }
 
-VidgfxVertbuf *vidgfx_context_new_vertbuf(
+VidgfxVertBuf *vidgfx_context_new_vertbuf(
 	VidgfxContext *context,
 	int size)
 {
@@ -481,7 +674,7 @@ VidgfxVertbuf *vidgfx_context_new_vertbuf(
 
 void vidgfx_context_destroy_vertbuf(
 	VidgfxContext *context,
-	VidgfxVertbuf *buf)
+	VidgfxVertBuf *buf)
 {
 	context->deleteVertexBuffer(buf);
 }
@@ -677,7 +870,7 @@ void vidgfx_context_clear(
 
 void vidgfx_context_draw_buf(
 	VidgfxContext *context,
-	VidgfxVertbuf *buf,
+	VidgfxVertBuf *buf,
 	int num_vertices,
 	int start_vertex)
 {
