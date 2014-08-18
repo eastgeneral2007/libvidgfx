@@ -830,6 +830,7 @@ D3DContext::~D3DContext()
 
 	// Emit destroyed signal so that other parts of the application can cleanly
 	// release their hardware resources
+	callDestroyingCallbacks();
 	emit destroying(this);
 
 	// Release advanced rendering objects
@@ -1365,6 +1366,7 @@ bool D3DContext::initialize(
 
 	// The context is now fully initialized and other parts of the application
 	// can begin to create hardware resources. Emit a signal so they know.
+	callInitializedCallbacks();
 	emit initialized(this);
 
 	return true;

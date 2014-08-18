@@ -20,6 +20,8 @@
 
 #include <QtCore/QRect>
 #include <QtCore/QString>
+#include <QtGui/QColor>
+#include <QtGui/QMatrix4x4>
 
 // Export symbols from the DLL while allowing header file reuse by users
 #ifdef LIBVIDGFX_LIB
@@ -33,9 +35,9 @@
 
 // Library version. NOTE: Don't forget to update the values in the resource
 // files as well ("Libvidgfx.rc")
-#define LIBVIDGFX_VER_STR "v0.5.0"
+#define LIBVIDGFX_VER_STR "v0.6.0"
 #define LIBVIDGFX_VER_MAJOR 0
-#define LIBVIDGFX_VER_MINOR 5
+#define LIBVIDGFX_VER_MINOR 6
 #define LIBVIDGFX_VER_BUILD 0
 
 //=============================================================================
@@ -171,5 +173,301 @@ LVG_EXPORT bool	initLibvidgfx_internal(
 	if(!initLibvidgfx_internal( \
 	LIBVIDGFX_VER_MAJOR, LIBVIDGFX_VER_MINOR, LIBVIDGFX_VER_BUILD)) \
 	return 1
+
+//=============================================================================
+// GraphicsContext C interface
+
+class GraphicsContext;
+class Texture;
+class VertexBuffer;
+
+typedef GraphicsContext		VidgfxContext;
+typedef Texture				VidgfxTex;
+typedef VertexBuffer		VidgfxVertbuf;
+
+typedef GfxRenderTarget		VidgfxRendTarget;
+typedef GfxFilter			VidgfxFilter;
+typedef GfxPixelFormat		VidgfxPixFormat;
+typedef GfxShader			VidgfxShader;
+typedef GfxTopology			VidgfxTopology;
+typedef GfxBlending			VidgfxBlending;
+
+//-----------------------------------------------------------------------------
+// Static methods
+
+LVG_EXPORT bool vidgfx_create_solid_rect(
+	VidgfxVertbuf *out_buf,
+	const QRectF &rect,
+	const QColor &col);
+LVG_EXPORT bool vidgfx_create_solid_rect(
+	VidgfxVertbuf *out_buf,
+	const QRectF &rect,
+	const QColor &tl_col,
+	const QColor &tr_col,
+	const QColor &bl_col,
+	const QColor &br_col);
+
+LVG_EXPORT bool vidgfx_create_solid_rect_outline(
+	VidgfxVertbuf *out_buf,
+	const QRectF &rect,
+	const QColor &col,
+	const QPointF &half_width = QPointF(0.5f, 0.5f));
+LVG_EXPORT bool vidgfx_create_solid_rect_outline(
+	VidgfxVertbuf *out_buf,
+	const QRectF &rect,
+	const QColor &tl_col,
+	const QColor &tr_col,
+	const QColor &bl_col,
+	const QColor &br_col,
+	const QPointF &half_width = QPointF(0.5f, 0.5f));
+
+LVG_EXPORT bool vidgfx_create_tex_decal_rect(
+	VidgfxVertbuf *out_buf,
+	const QRectF &rect);
+LVG_EXPORT bool vidgfx_create_tex_decal_rect(
+	VidgfxVertbuf *out_buf,
+	const QRectF &rect,
+	const QPointF &br_uv);
+LVG_EXPORT bool vidgfx_create_tex_decal_rect(
+	VidgfxVertbuf *out_buf,
+	const QRectF &rect,
+	const QPointF &tl_uv,
+	const QPointF &tr_uv,
+	const QPointF &bl_uv,
+	const QPointF &br_uv);
+
+LVG_EXPORT bool vidgfx_create_resize_rect(
+	VidgfxVertbuf *out_buf,
+	const QRectF &rect,
+	float handle_size,
+	const QPointF &half_width = QPointF(0.5f, 0.5f));
+
+// Helpers
+LVG_EXPORT quint32 vidgfx_next_pow_two(
+	quint32 n);
+
+//-----------------------------------------------------------------------------
+// Methods
+
+LVG_EXPORT void vidgfx_context_set_view_mat(
+	VidgfxContext *context,
+	const QMatrix4x4 &matrix);
+LVG_EXPORT QMatrix4x4 vidgfx_context_get_view_mat(
+	VidgfxContext *context);
+LVG_EXPORT void vidgfx_context_set_proj_mat(
+	VidgfxContext *context,
+	const QMatrix4x4 &matrix);
+LVG_EXPORT QMatrix4x4 vidgfx_context_get_proj_mat(
+	VidgfxContext *context);
+
+LVG_EXPORT void vidgfx_context_set_screen_view_mat(
+	VidgfxContext *context,
+	const QMatrix4x4 &matrix);
+LVG_EXPORT QMatrix4x4 vidgfx_context_get_screen_view_mat(
+	VidgfxContext *context);
+LVG_EXPORT void vidgfx_context_set_screen_proj_mat(
+	VidgfxContext *context,
+	const QMatrix4x4 &matrix);
+LVG_EXPORT QMatrix4x4 vidgfx_context_get_screen_proj_mat(
+	VidgfxContext *context);
+
+LVG_EXPORT void vidgfx_context_set_user_render_target(
+	VidgfxContext *context,
+	VidgfxTex *tex_a,
+	VidgfxTex *tex_b = NULL);
+LVG_EXPORT VidgfxTex *vidgfx_context_get_user_render_target(
+	VidgfxContext *context,
+	int index);
+LVG_EXPORT void vidgfx_context_set_user_render_target_viewport(
+	VidgfxContext *context,
+	const QRect &rect);
+LVG_EXPORT void vidgfx_context_set_user_render_target_viewport(
+	VidgfxContext *context,
+	const QSize &size);
+LVG_EXPORT QRect vidgfx_context_get_user_render_target_viewport(
+	VidgfxContext *context);
+
+LVG_EXPORT void vidgfx_context_set_resize_layer_rect(
+	VidgfxContext *context,
+	const QRectF &rect);
+LVG_EXPORT QRectF vidgfx_context_get_resize_layer_rect(
+	VidgfxContext *context);
+
+LVG_EXPORT void vidgfx_context_set_rgb_nv16_px_size(
+	VidgfxContext *context,
+	const QPointF &size);
+LVG_EXPORT QPointF vidgfx_context_get_rgb_nv16_px_size(
+	VidgfxContext *context);
+
+LVG_EXPORT void vidgfx_context_set_tex_decal_mod_color(
+	VidgfxContext *context,
+	const QColor &color);
+LVG_EXPORT QColor vidgfx_context_get_tex_decal_mod_color(
+	VidgfxContext *context);
+
+LVG_EXPORT void vidgfx_context_set_tex_decal_effects(
+	VidgfxContext *context,
+	float gamma,
+	float brightness,
+	float contrast,
+	float saturation);
+LVG_EXPORT bool vidgfx_context_set_tex_decal_effects_helper(
+	VidgfxContext *context,
+	float gamma,
+	int brightness,
+	int contrast,
+	int saturation);
+LVG_EXPORT const float *vidgfx_context_get_tex_decal_effects(
+	VidgfxContext *context);
+
+LVG_EXPORT bool vidgfx_context_dilute_img(
+	VidgfxContext *context,
+	QImage &img);
+
+//-----------------------------------------------------------------------------
+// Interface
+
+LVG_EXPORT bool vidgfx_context_is_valid(
+	VidgfxContext *context);
+LVG_EXPORT void vidgfx_context_flush(
+	VidgfxContext *context);
+
+// Buffers
+LVG_EXPORT VidgfxVertbuf *vidgfx_context_new_vertbuf(
+	VidgfxContext *context,
+	int size);
+LVG_EXPORT void vidgfx_context_destroy_vertbuf(
+	VidgfxContext *context,
+	VidgfxVertbuf *buf);
+LVG_EXPORT VidgfxTex *vidgfx_context_new_tex(
+	VidgfxContext *context,
+	QImage img,
+	bool writable = false,
+	bool targetable = false);
+LVG_EXPORT VidgfxTex *vidgfx_context_new_tex(
+	VidgfxContext *context,
+	const QSize &size,
+	bool writable = false,
+	bool targetable = false,
+	bool use_bgra = false);
+LVG_EXPORT VidgfxTex *vidgfx_context_new_tex(
+	VidgfxContext *context,
+	const QSize &size,
+	VidgfxTex *same_format,
+	bool writable = false,
+	bool targetable = false);
+LVG_EXPORT VidgfxTex *vidgfx_context_new_staging_tex(
+	VidgfxContext *context,
+	const QSize &size);
+LVG_EXPORT void vidgfx_context_destroy_tex(
+	VidgfxContext *context,
+	VidgfxTex *tex);
+LVG_EXPORT bool vidgfx_context_copy_tex_data(
+	VidgfxContext *context,
+	VidgfxTex *dst,
+	VidgfxTex *src,
+	const QPoint &dst_pos,
+	const QRect &src_rect);
+
+// Render targets
+LVG_EXPORT void vidgfx_context_resize_screen_target(
+	VidgfxContext *context,
+	const QSize &new_size);
+LVG_EXPORT void vidgfx_context_resize_canvas_target(
+	VidgfxContext *context,
+	const QSize &new_size);
+LVG_EXPORT void vidgfx_context_resize_scratch_target(
+	VidgfxContext *context,
+	const QSize &new_size);
+LVG_EXPORT void vidgfx_context_swap_screen_bufs(
+	VidgfxContext *context);
+LVG_EXPORT VidgfxTex *vidgfx_context_get_target_tex(
+	VidgfxContext *context,
+	VidgfxRendTarget target);
+LVG_EXPORT GfxRenderTarget vidgfx_context_get_next_scratch_target(
+	VidgfxContext *context);
+LVG_EXPORT QPointF vidgfx_context_get_scratch_target_to_tex_ratio(
+	VidgfxContext *context);
+
+// Advanced rendering
+LVG_EXPORT VidgfxTex *vidgfx_context_prepare_tex(
+	VidgfxContext *context,
+	VidgfxTex *tex,
+	const QSize &size,
+	VidgfxFilter filter,
+	bool set_filter,
+	QPointF &px_size_out,
+	QPointF &bot_right_out);
+LVG_EXPORT VidgfxTex *vidgfx_context_prepare_tex(
+	VidgfxContext *context,
+	VidgfxTex *tex,
+	const QRect &crop_rect,
+	const QSize &size,
+	VidgfxFilter filter,
+	bool set_filter,
+	QPointF &px_size_out,
+	QPointF &top_left_out,
+	QPointF &bot_right_out);
+LVG_EXPORT VidgfxTex *vidgfx_context_convert_to_bgrx(
+	VidgfxContext *context,
+	VidgfxPixFormat format,
+	VidgfxTex *plane_a,
+	VidgfxTex *plane_b,
+	VidgfxTex *plane_c);
+
+// Drawing
+LVG_EXPORT void vidgfx_context_set_render_target(
+	VidgfxContext *context,
+	VidgfxRendTarget target);
+LVG_EXPORT void vidgfx_context_set_shader(
+	VidgfxContext *context,
+	VidgfxShader shader);
+LVG_EXPORT void vidgfx_context_set_topology(
+	VidgfxContext *context,
+	VidgfxTopology topology);
+LVG_EXPORT void vidgfx_context_set_blending(
+	VidgfxContext *context,
+	VidgfxBlending blending);
+LVG_EXPORT void vidgfx_context_set_tex(
+	VidgfxContext *context,
+	VidgfxTex *tex_a,
+	VidgfxTex *tex_b = NULL,
+	VidgfxTex *tex_c = NULL);
+LVG_EXPORT void vidgfx_context_set_tex_filter(
+	VidgfxContext *context,
+	VidgfxFilter filter);
+LVG_EXPORT void vidgfx_context_clear(
+	VidgfxContext *context,
+	const QColor &color);
+LVG_EXPORT void vidgfx_context_draw_buf(
+	VidgfxContext *context,
+	VidgfxVertbuf *buf,
+	int num_vertices = -1,
+	int start_vertex = 0);
+
+//-----------------------------------------------------------------------------
+// Signals
+
+typedef void VidgfxContextInitializedCallback(
+	void *opaque, VidgfxContext *context);
+typedef void VidgfxContextDestroyingCallback(
+	void *opaque, VidgfxContext *context);
+
+LVG_EXPORT void vidgfx_context_add_initialized_callback(
+	VidgfxContext *context,
+	VidgfxContextInitializedCallback *initialized,
+	void *opaque);
+LVG_EXPORT void vidgfx_context_remove_initialized_callback(
+	VidgfxContext *context,
+	VidgfxContextInitializedCallback *initialized,
+	void *opaque);
+LVG_EXPORT void vidgfx_context_add_destroying_callback(
+	VidgfxContext *context,
+	VidgfxContextDestroyingCallback *destroying,
+	void *opaque);
+LVG_EXPORT void vidgfx_context_remove_destroying_callback(
+	VidgfxContext *context,
+	VidgfxContextDestroyingCallback *destroying,
+	void *opaque);
 
 #endif // LIBVIDGFX_H

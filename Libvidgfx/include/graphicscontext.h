@@ -293,6 +293,27 @@ class LVG_EXPORT GraphicsContext : public QObject
 {
 	Q_OBJECT
 
+private: // Datatypes ---------------------------------------------------------
+	struct InitializedCallback {
+		VidgfxContextInitializedCallback *	callback;
+		void *								opaque;
+
+		inline bool operator==(const InitializedCallback &r) const {
+			return callback == r.callback && opaque == r.opaque;
+		};
+	};
+	typedef QVector<InitializedCallback> InitializedCallbackList;
+
+	struct DestroyingCallback {
+		VidgfxContextDestroyingCallback *	callback;
+		void *								opaque;
+
+		inline bool operator==(const DestroyingCallback &r) const {
+			return callback == r.callback && opaque == r.opaque;
+		};
+	};
+	typedef QVector<DestroyingCallback> DestroyingCallbackList;
+
 public: // Constants ----------------------------------------------------------
 
 	// The number of vertices required to represent one line
@@ -346,6 +367,9 @@ protected: // Members ---------------------------------------------------------
 	QColor			m_texDecalModulate;
 	float			m_texDecalEffects[4]; // Gamma, brightness, contrast, saturation
 	bool			m_texDecalConstantsDirty;
+
+	InitializedCallbackList	m_initializedCallbackList;
+	DestroyingCallbackList	m_destroyingCallbackList;
 
 public: // Static methods -----------------------------------------------------
 	static bool		createSolidRect(
@@ -468,6 +492,19 @@ public: // Interface ----------------------------------------------------------
 	virtual void		clear(const QColor &color) = 0;
 	virtual void		drawBuffer(
 		VertexBuffer *buf, int numVertices = -1, int startVertex = 0) = 0;
+
+public: // Signals ------------------------------------------------------------
+	void	callInitializedCallbacks();
+	void	addInitializedCallback(
+		VidgfxContextInitializedCallback *initialized, void *opaque);
+	void	removeInitializedCallback(
+		VidgfxContextInitializedCallback *initialized, void *opaque);
+
+	void	callDestroyingCallbacks();
+	void	addDestroyingCallback(
+		VidgfxContextDestroyingCallback *destroying, void *opaque);
+	void	removeDestroyingCallback(
+		VidgfxContextDestroyingCallback *destroying, void *opaque);
 
 Q_SIGNALS: // Signals ---------------------------------------------------------
 	void	initialized(GraphicsContext *gfx);
