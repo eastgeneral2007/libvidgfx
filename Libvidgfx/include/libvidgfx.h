@@ -175,7 +175,7 @@ LVG_EXPORT bool	initLibvidgfx_internal(
 	return 1
 
 //=============================================================================
-// GraphicsContext C interface
+// C interface datatypes
 
 class GraphicsContext;
 class Texture;
@@ -191,6 +191,52 @@ typedef GfxPixelFormat		VidgfxPixFormat;
 typedef GfxShader			VidgfxShader;
 typedef GfxTopology			VidgfxTopology;
 typedef GfxBlending			VidgfxBlending;
+
+//=============================================================================
+// Texture C interface
+
+//-----------------------------------------------------------------------------
+// Methods
+
+LVG_EXPORT bool vidgfx_tex_is_valid(
+	VidgfxTex *tex);
+LVG_EXPORT bool vidgfx_tex_is_mapped(
+	VidgfxTex *tex);
+LVG_EXPORT void *vidgfx_tex_get_data_ptr(
+	VidgfxTex *tex);
+LVG_EXPORT int vidgfx_tex_get_stride(
+	VidgfxTex *tex);
+
+LVG_EXPORT bool vidgfx_tex_is_writable(
+	VidgfxTex *tex);
+LVG_EXPORT bool vidgfx_tex_is_targetable(
+	VidgfxTex *tex);
+LVG_EXPORT bool vidgfx_tex_is_staging(
+	VidgfxTex *tex);
+LVG_EXPORT QSize vidgfx_tex_get_size(
+	VidgfxTex *tex);
+LVG_EXPORT int vidgfx_tex_get_width(
+	VidgfxTex *tex);
+LVG_EXPORT int vidgfx_tex_get_height(
+	VidgfxTex *tex);
+
+LVG_EXPORT void vidgfx_tex_update_data(
+	VidgfxTex *tex,
+	const QImage &img);
+
+//-----------------------------------------------------------------------------
+// Interface
+
+LVG_EXPORT void *vidgfx_tex_map(
+	VidgfxTex *tex);
+LVG_EXPORT void vidgfx_tex_unmap(
+	VidgfxTex *tex);
+
+LVG_EXPORT bool vidgfx_tex_is_srgb_hack(
+	VidgfxTex *tex);
+
+//=============================================================================
+// GraphicsContext C interface
 
 //-----------------------------------------------------------------------------
 // Static methods

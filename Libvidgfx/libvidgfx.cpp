@@ -105,6 +105,102 @@ bool initLibvidgfx_internal(int libVerMajor, int libVerMinor, int libVerPatch)
 }
 
 //=============================================================================
+// Texture C interface
+
+//-----------------------------------------------------------------------------
+// Methods
+
+bool vidgfx_tex_is_valid(
+	VidgfxTex *tex)
+{
+	if(tex == NULL)
+		return false;
+	return tex->isValid();
+}
+
+bool vidgfx_tex_is_mapped(
+	VidgfxTex *tex)
+{
+	return tex->isMapped();
+}
+
+void *vidgfx_tex_get_data_ptr(
+	VidgfxTex *tex)
+{
+	return tex->getDataPtr();
+}
+
+int vidgfx_tex_get_stride(
+	VidgfxTex *tex)
+{
+	return tex->getStride();
+}
+
+bool vidgfx_tex_is_writable(
+	VidgfxTex *tex)
+{
+	return tex->isWritable();
+}
+
+bool vidgfx_tex_is_targetable(
+	VidgfxTex *tex)
+{
+	return tex->isTargetable();
+}
+
+bool vidgfx_tex_is_staging(
+	VidgfxTex *tex)
+{
+	return tex->isStaging();
+}
+
+QSize vidgfx_tex_get_size(
+	VidgfxTex *tex)
+{
+	return tex->getSize();
+}
+
+int vidgfx_tex_get_width(
+	VidgfxTex *tex)
+{
+	return tex->getWidth();
+}
+
+int vidgfx_tex_get_height(
+	VidgfxTex *tex)
+{
+	return tex->getHeight();
+}
+
+void vidgfx_tex_update_data(
+	VidgfxTex *tex,
+	const QImage &img)
+{
+	tex->updateData(img);
+}
+
+//-----------------------------------------------------------------------------
+// Interface
+
+void *vidgfx_tex_map(
+	VidgfxTex *tex)
+{
+	return tex->map();
+}
+
+void vidgfx_tex_unmap(
+	VidgfxTex *tex)
+{
+	tex->unmap();
+}
+
+bool vidgfx_tex_is_srgb_hack(
+	VidgfxTex *tex)
+{
+	return tex->isSrgbHack();
+}
+
+//=============================================================================
 // GraphicsContext C interface
 
 //-----------------------------------------------------------------------------
