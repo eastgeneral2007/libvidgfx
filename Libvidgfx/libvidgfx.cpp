@@ -221,7 +221,7 @@ VidgfxVertBuf *vidgfx_texdecalbuf_get_vert_buf(
 	return reinterpret_cast<VidgfxVertBuf *>(ret);
 }
 
-GfxTopology vidgfx_texdecalbuf_get_topology(
+VidgfxTopology vidgfx_texdecalbuf_get_topology(
 	VidgfxTexDecalBuf *buf)
 {
 	TexDecalVertBuf *ptr = reinterpret_cast<TexDecalVertBuf *>(buf);
@@ -875,7 +875,7 @@ VidgfxTex *vidgfx_context_get_target_tex(
 	return reinterpret_cast<VidgfxTex *>(ret);
 }
 
-GfxRenderTarget vidgfx_context_get_next_scratch_target(
+VidgfxRendTarget vidgfx_context_get_next_scratch_target(
 	VidgfxContext *context)
 {
 	GraphicsContext *ptr = reinterpret_cast<GraphicsContext *>(context);

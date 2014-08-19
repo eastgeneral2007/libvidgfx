@@ -32,7 +32,7 @@ class QSize;
 // having `map()` and `unmap()` methods instead of keeping a copy of the data
 // always in memory. However some functions such as `drawTextureRect()` rely
 // on the data being in memory as well.
-class LVG_EXPORT VertexBuffer
+class VertexBuffer
 {
 protected: // Members ---------------------------------------------------------
 	float *	m_data;
@@ -105,7 +105,7 @@ inline bool VertexBuffer::isDirty() const
 /// decal texture. It is up to the user to either call `deleteVertBuf()` or
 /// delete the whole object when the graphics context is released.
 /// </summary>
-class LVG_EXPORT TexDecalVertBuf
+class TexDecalVertBuf
 {
 private: // Constants ---------------------------------------------------------
 
@@ -140,7 +140,7 @@ public: // Constructor/destructor ---------------------------------------------
 public: // Methods ------------------------------------------------------------
 	void			setContext(GraphicsContext *context);
 	VertexBuffer *	getVertBuf(); // Applies settings
-	GfxTopology		getTopology() const;
+	VidgfxTopology	getTopology() const;
 	void			deleteVertBuf();
 
 	// Position
@@ -202,7 +202,7 @@ inline void TexDecalVertBuf::setTextureUv(
 }
 
 //=============================================================================
-class LVG_EXPORT Texture
+class Texture
 {
 protected: // Members ---------------------------------------------------------
 	bool			m_isValid;
@@ -289,7 +289,7 @@ inline int Texture::getHeight() const
 }
 
 //=============================================================================
-class LVG_EXPORT GraphicsContext : public QObject
+class GraphicsContext : public QObject
 {
 	Q_OBJECT
 
@@ -343,7 +343,7 @@ public: // Constants ----------------------------------------------------------
 	static const int	ResizeRectBufSize = VIDGFX_RESIZE_RECT_BUF_SIZE;
 
 protected: // Members ---------------------------------------------------------
-	GfxRenderTarget	m_currentTarget;
+	VidgfxRendTarget	m_currentTarget;
 
 	QMatrix4x4		m_screenViewMat;
 	QMatrix4x4		m_screenProjMat;
@@ -461,34 +461,34 @@ public: // Interface ----------------------------------------------------------
 		const QRect &srcRect) = 0;
 
 	// Render targets
-	virtual void			resizeScreenTarget(const QSize &newSize) = 0;
-	virtual void			resizeCanvasTarget(const QSize &newSize) = 0;
-	virtual void			resizeScratchTarget(const QSize &newSize) = 0;
-	virtual void			swapScreenBuffers() = 0;
-	virtual	Texture *		getTargetTexture(GfxRenderTarget target) = 0;
-	virtual GfxRenderTarget	getNextScratchTarget() = 0;
-	virtual QPointF			getScratchTargetToTextureRatio() = 0;
+	virtual void				resizeScreenTarget(const QSize &newSize) = 0;
+	virtual void				resizeCanvasTarget(const QSize &newSize) = 0;
+	virtual void				resizeScratchTarget(const QSize &newSize) = 0;
+	virtual void				swapScreenBuffers() = 0;
+	virtual	Texture *			getTargetTexture(VidgfxRendTarget target) = 0;
+	virtual VidgfxRendTarget	getNextScratchTarget() = 0;
+	virtual QPointF				getScratchTargetToTextureRatio() = 0;
 
 	// Advanced rendering
 	virtual Texture *	prepareTexture(
-		Texture *tex, const QSize &size, GfxFilter filter, bool setFilter,
+		Texture *tex, const QSize &size, VidgfxFilter filter, bool setFilter,
 		QPointF &pxSizeOut, QPointF &botRightOut) = 0;
 	virtual Texture *	prepareTexture(
 		Texture *tex, const QRect &cropRect, const QSize &size,
-		GfxFilter filter, bool setFilter, QPointF &pxSizeOut,
+		VidgfxFilter filter, bool setFilter, QPointF &pxSizeOut,
 		QPointF &topLeftOut, QPointF &botRightOut) = 0;
 	virtual Texture *	convertToBgrx(
-		GfxPixelFormat format, Texture *planeA, Texture *planeB,
+		VidgfxPixFormat format, Texture *planeA, Texture *planeB,
 		Texture *planeC) = 0;
 
 	// Drawing
-	virtual void		setRenderTarget(GfxRenderTarget target) = 0;
-	virtual void		setShader(GfxShader shader) = 0;
-	virtual void		setTopology(GfxTopology topology) = 0;
-	virtual void		setBlending(GfxBlending blending) = 0;
+	virtual void		setRenderTarget(VidgfxRendTarget target) = 0;
+	virtual void		setShader(VidgfxShader shader) = 0;
+	virtual void		setTopology(VidgfxTopology topology) = 0;
+	virtual void		setBlending(VidgfxBlending blending) = 0;
 	virtual void		setTexture(
 		Texture *texA, Texture *texB = NULL, Texture *texC = NULL) = 0;
-	virtual void		setTextureFilter(GfxFilter filter) = 0;
+	virtual void		setTextureFilter(VidgfxFilter filter) = 0;
 	virtual void		clear(const QColor &color) = 0;
 	virtual void		drawBuffer(
 		VertexBuffer *buf, int numVertices = -1, int startVertex = 0) = 0;

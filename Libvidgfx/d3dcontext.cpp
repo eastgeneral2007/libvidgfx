@@ -2213,7 +2213,7 @@ void D3DContext::swapScreenBuffers()
 	m_swapChain->Present(0, 0);
 }
 
-Texture *D3DContext::getTargetTexture(GfxRenderTarget target)
+Texture *D3DContext::getTargetTexture(VidgfxRendTarget target)
 {
 	switch(target) {
 	default:
@@ -2236,9 +2236,9 @@ Texture *D3DContext::getTargetTexture(GfxRenderTarget target)
 /// Returns the next available scratch target so that it's possible to chain
 /// multiple scratch renders back-to-back.
 /// </summary>
-GfxRenderTarget D3DContext::getNextScratchTarget()
+VidgfxRendTarget D3DContext::getNextScratchTarget()
 {
-	GfxRenderTarget ret = GfxScratch1Target;
+	VidgfxRendTarget ret = GfxScratch1Target;
 	if(m_scratchNextTarget == 1)
 		ret = GfxScratch2Target;
 	m_scratchNextTarget ^= 1;
@@ -2266,7 +2266,7 @@ QPointF D3DContext::getScratchTargetToTextureRatio()
 // Advanced rendering
 
 Texture *D3DContext::prepareTexture(
-	Texture *tex, const QSize &size, GfxFilter filter, bool setFilter,
+	Texture *tex, const QSize &size, VidgfxFilter filter, bool setFilter,
 	QPointF &pxSizeOut, QPointF &botRightOut)
 {
 	// Even if the input is invalid still try to provide a sane output
@@ -2319,7 +2319,7 @@ Texture *D3DContext::prepareTexture(
 /// </summary>
 Texture *D3DContext::prepareTexture(
 	Texture *tex, const QRect &cropRect, const QSize &size,
-	GfxFilter filter, bool setFilter, QPointF &pxSizeOut,
+	VidgfxFilter filter, bool setFilter, QPointF &pxSizeOut,
 	QPointF &topLeftOut, QPointF &botRightOut)
 {
 	// Even if the input is invalid still try to provide a sane output
@@ -2340,7 +2340,7 @@ Texture *D3DContext::prepareTexture(
 	Texture *outTex = tex;
 
 	// Remember original state
-	GfxRenderTarget origTarget = m_currentTarget;
+	VidgfxRendTarget origTarget = m_currentTarget;
 
 	// TODO: Validate crop rectangle
 
@@ -2393,7 +2393,7 @@ Texture *D3DContext::prepareTexture(
 
 			// Setup render target
 			resizeScratchTarget(nextSize);
-			GfxRenderTarget target = getNextScratchTarget();
+			VidgfxRendTarget target = getNextScratchTarget();
 			setRenderTarget(target);
 			QMatrix4x4 mat;
 			setViewMatrix(mat);
@@ -2455,7 +2455,7 @@ Texture *D3DContext::prepareTexture(
 /// </summary>
 /// <returns>NULL if the texture could not be converted</returns>
 Texture *D3DContext::convertToBgrx(
-	GfxPixelFormat format, Texture *planeA, Texture *planeB, Texture *planeC)
+	VidgfxPixFormat format, Texture *planeA, Texture *planeB, Texture *planeC)
 {
 	if(format >= NUM_PIXEL_FORMAT_TYPES)
 		return NULL;
@@ -2498,7 +2498,7 @@ Texture *D3DContext::convertToBgrx(
 		//--------------------------------------------------------------------
 
 		// Remember original state
-		GfxRenderTarget origTarget = m_currentTarget;
+		VidgfxRendTarget origTarget = m_currentTarget;
 
 		// Update the vertex buffer. NOTE: We reuse the mipmapping buffer
 		createTexDecalRect(
@@ -2507,7 +2507,7 @@ Texture *D3DContext::convertToBgrx(
 
 		// Setup render target
 		resizeScratchTarget(outSize);
-		GfxRenderTarget target = getNextScratchTarget();
+		VidgfxRendTarget target = getNextScratchTarget();
 		setRenderTarget(target);
 		QMatrix4x4 mat;
 		setViewMatrix(mat);
@@ -2564,7 +2564,7 @@ Texture *D3DContext::convertToBgrx(
 		//--------------------------------------------------------------------
 
 		// Remember original state
-		GfxRenderTarget origTarget = m_currentTarget;
+		VidgfxRendTarget origTarget = m_currentTarget;
 
 		// Update the vertex buffer. NOTE: We reuse the mipmapping buffer
 		createTexDecalRect(
@@ -2573,7 +2573,7 @@ Texture *D3DContext::convertToBgrx(
 
 		// Setup render target
 		resizeScratchTarget(outSize);
-		GfxRenderTarget target = getNextScratchTarget();
+		VidgfxRendTarget target = getNextScratchTarget();
 		setRenderTarget(target);
 		QMatrix4x4 mat;
 		setViewMatrix(mat);
@@ -2631,7 +2631,7 @@ Texture *D3DContext::convertToBgrx(
 //-----------------------------------------------------------------------------
 // Drawing
 
-void D3DContext::setRenderTarget(GfxRenderTarget target)
+void D3DContext::setRenderTarget(VidgfxRendTarget target)
 {
 	if(!isValid())
 		return; // DirectX must be initialized
@@ -2705,7 +2705,7 @@ void D3DContext::setRenderTarget(GfxRenderTarget target)
 	m_cameraConstantsDirty = true;
 }
 
-void D3DContext::setShader(GfxShader shader)
+void D3DContext::setShader(VidgfxShader shader)
 {
 	if(!isValid())
 		return; // DirectX must be initialized
@@ -2773,7 +2773,7 @@ void D3DContext::setShader(GfxShader shader)
 	m_boundShader = shader;
 }
 
-void D3DContext::setTopology(GfxTopology topology)
+void D3DContext::setTopology(VidgfxTopology topology)
 {
 	if(!isValid())
 		return; // DirectX must be initialized
@@ -2791,7 +2791,7 @@ void D3DContext::setTopology(GfxTopology topology)
 	}
 }
 
-void D3DContext::setBlending(GfxBlending blending)
+void D3DContext::setBlending(VidgfxBlending blending)
 {
 	if(!isValid())
 		return; // DirectX must be initialized
@@ -2843,7 +2843,7 @@ void D3DContext::setTexture(Texture *texA, Texture *texB, Texture *texC)
 	setSwizzleInTexDecal(textureA->doBgraSwizzle());
 }
 
-void D3DContext::setTextureFilter(GfxFilter filter)
+void D3DContext::setTextureFilter(VidgfxFilter filter)
 {
 	if(!isValid())
 		return; // DirectX must be initialized

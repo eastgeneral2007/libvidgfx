@@ -373,7 +373,7 @@ VertexBuffer *TexDecalVertBuf::getVertBuf()
 /// <summary>
 /// Returns the topology that the vertex buffer should be rendered with.
 /// </summary>
-GfxTopology TexDecalVertBuf::getTopology() const
+VidgfxTopology TexDecalVertBuf::getTopology() const
 {
 	if(m_hasScrolling)
 		return GfxTriangleListTopology;

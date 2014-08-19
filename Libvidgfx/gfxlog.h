@@ -46,7 +46,7 @@ public: // Members ------------------------------------------------------------
 	GfxLogData *	d;
 
 public: // Static methods -----------------------------------------------------
-	LVG_EXPORT static void	setCallback(VidgfxLogCallback *funcPtr);
+	static void	setCallback(VidgfxLogCallback *funcPtr);
 
 public: // Constructor/destructor ---------------------------------------------
 	GfxLog();

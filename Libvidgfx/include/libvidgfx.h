@@ -39,9 +39,9 @@
 
 // Export symbols from the DLL while allowing header file reuse by users
 #ifdef LIBVIDGFX_LIB
-#define LVG_EXPORT Q_DECL_EXPORT
+#define API_EXPORT Q_DECL_EXPORT
 #else
-#define LVG_EXPORT Q_DECL_IMPORT
+#define API_EXPORT Q_DECL_IMPORT
 #endif
 
 //=============================================================================
@@ -58,12 +58,12 @@
 // Enumerations
 
 // Do not use line topologies as they are unreliable and prone to bugs
-enum GfxTopology {
+enum VidgfxTopology {
 	GfxTriangleListTopology,
 	GfxTriangleStripTopology
 };
 
-enum GfxRenderTarget {
+enum VidgfxRendTarget {
 	GfxScreenTarget = 0,
 	GfxCanvas1Target,
 	GfxCanvas2Target,
@@ -74,7 +74,7 @@ enum GfxRenderTarget {
 
 // WARNING: If this enum is modified `DShowRenderer::compareFormats()` and
 // `D3DContext::convertToBgrx()` also need to be updated.
-enum GfxPixelFormat {
+enum VidgfxPixFormat {
 	GfxNoFormat = 0,
 
 	// Uncompressed RGB with a single packed plane
@@ -96,7 +96,7 @@ enum GfxPixelFormat {
 
 	NUM_PIXEL_FORMAT_TYPES // Must be last
 };
-static const char * const GfxPixelFormatStrings[] = {
+static const char * const VidgfxPixFormatStrings[] = {
 	"Unknown",
 
 	// Uncompressed RGB with a single packed plane
@@ -117,7 +117,7 @@ static const char * const GfxPixelFormatStrings[] = {
 	"YUY2"
 };
 
-enum GfxShader {
+enum VidgfxShader {
 	GfxNoShader = 0,
 	GfxSolidShader,
 	GfxTexDecalShader,
@@ -131,7 +131,7 @@ enum GfxShader {
 	GfxYuy2RgbShader
 };
 
-enum GfxFilter {
+enum VidgfxFilter {
 	// Standard filters shown to the user
 	GfxPointFilter = 0,
 	GfxBilinearFilter,
@@ -142,18 +142,18 @@ enum GfxFilter {
 	// Special internal filters
 	GfxResizeLayerFilter = NUM_STANDARD_TEXTURE_FILTERS
 };
-static const char * const GfxFilterStrings[] = {
+static const char * const VidgfxFilterStrings[] = {
 	"Nearest neighbour",
 	"Bilinear",
 	//"Bicubic",
 };
-static const char * const GfxFilterQualityStrings[] = {
+static const char * const VidgfxFilterQualityStrings[] = {
 	"Low (Nearest neighbour)",
 	"Medium (Bilinear)",
 	//"High (Bicubic)",
 };
 
-enum GfxBlending {
+enum VidgfxBlending {
 	GfxNoBlending = 0,
 	GfxAlphaBlending,
 	GfxPremultipliedBlending
@@ -183,7 +183,7 @@ enum GfxLogLevel {
 //=============================================================================
 // Library initialization
 
-LVG_EXPORT bool	initLibvidgfx_internal(
+API_EXPORT bool	initLibvidgfx_internal(
 	int libVerMajor, int libVerMinor, int libVerPatch);
 
 /// <summary>
@@ -206,20 +206,13 @@ DECLARE_OPAQUE(VidgfxD3DContext);
 DECLARE_OPAQUE(VidgfxD3DTex);
 #undef DECLARE_OPAQUE
 
-typedef GfxRenderTarget		VidgfxRendTarget;
-typedef GfxFilter			VidgfxFilter;
-typedef GfxPixelFormat		VidgfxPixFormat;
-typedef GfxShader			VidgfxShader;
-typedef GfxTopology			VidgfxTopology;
-typedef GfxBlending			VidgfxBlending;
-
 //=============================================================================
 // GfxLog C interface
 
 typedef void VidgfxLogCallback(
 	const QString &cat, const QString &msg, GfxLogLevel lvl);
 
-LVG_EXPORT void vidgfx_set_log_callback(
+API_EXPORT void vidgfx_set_log_callback(
 	VidgfxLogCallback *callback);
 
 //=============================================================================
@@ -228,26 +221,26 @@ LVG_EXPORT void vidgfx_set_log_callback(
 //-----------------------------------------------------------------------------
 // Methods
 
-LVG_EXPORT float *vidgfx_vertbuf_get_data_ptr(
+API_EXPORT float *vidgfx_vertbuf_get_data_ptr(
 	VidgfxVertBuf *buf);
-LVG_EXPORT int vidgfx_vertbuf_get_num_floats(
+API_EXPORT int vidgfx_vertbuf_get_num_floats(
 	VidgfxVertBuf *buf);
 
-LVG_EXPORT void vidgfx_vertbuf_set_num_verts(
+API_EXPORT void vidgfx_vertbuf_set_num_verts(
 	VidgfxVertBuf *buf,
 	int num_verts);
-LVG_EXPORT int vidgfx_vertbuf_get_num_verts(
+API_EXPORT int vidgfx_vertbuf_get_num_verts(
 	VidgfxVertBuf *buf);
-LVG_EXPORT void vidgfx_vertbuf_set_vert_size(
+API_EXPORT void vidgfx_vertbuf_set_vert_size(
 	VidgfxVertBuf *buf,
 	int vert_size);
-LVG_EXPORT int vidgfx_vertbuf_get_vert_size(
+API_EXPORT int vidgfx_vertbuf_get_vert_size(
 	VidgfxVertBuf *buf);
 
-LVG_EXPORT void vidgfx_vertbuf_set_dirty(
+API_EXPORT void vidgfx_vertbuf_set_dirty(
 	VidgfxVertBuf *buf,
 	bool dirty = true);
-LVG_EXPORT bool vidgfx_vertbuf_is_dirty(
+API_EXPORT bool vidgfx_vertbuf_is_dirty(
 	VidgfxVertBuf *buf);
 
 //=============================================================================
@@ -263,64 +256,64 @@ LVG_EXPORT bool vidgfx_vertbuf_is_dirty(
 //-----------------------------------------------------------------------------
 // Constructor/destructor
 
-LVG_EXPORT VidgfxTexDecalBuf *vidgfx_texdecalbuf_new(
+API_EXPORT VidgfxTexDecalBuf *vidgfx_texdecalbuf_new(
 	VidgfxContext *context = NULL);
-LVG_EXPORT void vidgfx_texdecalbuf_destroy(
+API_EXPORT void vidgfx_texdecalbuf_destroy(
 	VidgfxTexDecalBuf *buf);
 
 //-----------------------------------------------------------------------------
 // Methods
 
-LVG_EXPORT void vidgfx_texdecalbuf_set_context(
+API_EXPORT void vidgfx_texdecalbuf_set_context(
 	VidgfxTexDecalBuf *buf,
 	VidgfxContext *context);
-LVG_EXPORT VidgfxVertBuf *vidgfx_texdecalbuf_get_vert_buf(
+API_EXPORT VidgfxVertBuf *vidgfx_texdecalbuf_get_vert_buf(
 	VidgfxTexDecalBuf *buf); // Applies settings
-LVG_EXPORT GfxTopology vidgfx_texdecalbuf_get_topology(
+API_EXPORT VidgfxTopology vidgfx_texdecalbuf_get_topology(
 	VidgfxTexDecalBuf *buf);
-LVG_EXPORT void vidgfx_texdecalbuf_destroy_vert_buf(
+API_EXPORT void vidgfx_texdecalbuf_destroy_vert_buf(
 	VidgfxTexDecalBuf *buf);
 
 // Position
-LVG_EXPORT void vidgfx_texdecalbuf_set_rect(
+API_EXPORT void vidgfx_texdecalbuf_set_rect(
 	VidgfxTexDecalBuf *buf,
 	const QRectF &rect);
-LVG_EXPORT QRectF vidgfx_texdecalbuf_get_rect(
+API_EXPORT QRectF vidgfx_texdecalbuf_get_rect(
 	VidgfxTexDecalBuf *buf);
 
 // Scrolling
-LVG_EXPORT void vidgfx_texdecalbuf_scroll_by(
+API_EXPORT void vidgfx_texdecalbuf_scroll_by(
 	VidgfxTexDecalBuf *buf,
 	const QPointF &delta);
-LVG_EXPORT void vidgfx_texdecalbuf_scroll_by(
+API_EXPORT void vidgfx_texdecalbuf_scroll_by(
 	VidgfxTexDecalBuf *buf,
 	float x_delta,
 	float y_delta);
-LVG_EXPORT void vidgfx_texdecalbuf_reset_scrolling(
+API_EXPORT void vidgfx_texdecalbuf_reset_scrolling(
 	VidgfxTexDecalBuf *buf);
-LVG_EXPORT void vidgfx_texdecalbuf_set_round_offset(
+API_EXPORT void vidgfx_texdecalbuf_set_round_offset(
 	VidgfxTexDecalBuf *buf,
 	bool round);
-LVG_EXPORT bool vidgfx_texdecalbuf_get_round_offset(
+API_EXPORT bool vidgfx_texdecalbuf_get_round_offset(
 	VidgfxTexDecalBuf *buf);
 
 // Texture UV
-LVG_EXPORT void vidgfx_texdecalbuf_set_tex_uv(
+API_EXPORT void vidgfx_texdecalbuf_set_tex_uv(
 	VidgfxTexDecalBuf *buf,
 	const QPointF &top_left,
 	const QPointF &top_right,
 	const QPointF &bot_left,
 	const QPointF &bot_right);
-LVG_EXPORT void vidgfx_texdecalbuf_set_tex_uv(
+API_EXPORT void vidgfx_texdecalbuf_set_tex_uv(
 	VidgfxTexDecalBuf *buf,
 	const QRectF &norm_rect,
 	GfxOrientation orient = GfxUnchangedOrient);
-LVG_EXPORT void vidgfx_texdecalbuf_set_tex_uv(
+API_EXPORT void vidgfx_texdecalbuf_set_tex_uv(
 	VidgfxTexDecalBuf *buf,
 	const QPointF &top_left,
 	const QPointF &bot_right,
 	GfxOrientation orient = GfxUnchangedOrient);
-LVG_EXPORT void vidgfx_texdecalbuf_get_tex_uv(
+API_EXPORT void vidgfx_texdecalbuf_get_tex_uv(
 	VidgfxTexDecalBuf *buf,
 	QPointF *top_left,
 	QPointF *top_right,
@@ -333,41 +326,41 @@ LVG_EXPORT void vidgfx_texdecalbuf_get_tex_uv(
 //-----------------------------------------------------------------------------
 // Methods
 
-LVG_EXPORT bool vidgfx_tex_is_valid(
+API_EXPORT bool vidgfx_tex_is_valid(
 	VidgfxTex *tex);
-LVG_EXPORT bool vidgfx_tex_is_mapped(
+API_EXPORT bool vidgfx_tex_is_mapped(
 	VidgfxTex *tex);
-LVG_EXPORT void *vidgfx_tex_get_data_ptr(
+API_EXPORT void *vidgfx_tex_get_data_ptr(
 	VidgfxTex *tex);
-LVG_EXPORT int vidgfx_tex_get_stride(
-	VidgfxTex *tex);
-
-LVG_EXPORT bool vidgfx_tex_is_writable(
-	VidgfxTex *tex);
-LVG_EXPORT bool vidgfx_tex_is_targetable(
-	VidgfxTex *tex);
-LVG_EXPORT bool vidgfx_tex_is_staging(
-	VidgfxTex *tex);
-LVG_EXPORT QSize vidgfx_tex_get_size(
-	VidgfxTex *tex);
-LVG_EXPORT int vidgfx_tex_get_width(
-	VidgfxTex *tex);
-LVG_EXPORT int vidgfx_tex_get_height(
+API_EXPORT int vidgfx_tex_get_stride(
 	VidgfxTex *tex);
 
-LVG_EXPORT void vidgfx_tex_update_data(
+API_EXPORT bool vidgfx_tex_is_writable(
+	VidgfxTex *tex);
+API_EXPORT bool vidgfx_tex_is_targetable(
+	VidgfxTex *tex);
+API_EXPORT bool vidgfx_tex_is_staging(
+	VidgfxTex *tex);
+API_EXPORT QSize vidgfx_tex_get_size(
+	VidgfxTex *tex);
+API_EXPORT int vidgfx_tex_get_width(
+	VidgfxTex *tex);
+API_EXPORT int vidgfx_tex_get_height(
+	VidgfxTex *tex);
+
+API_EXPORT void vidgfx_tex_update_data(
 	VidgfxTex *tex,
 	const QImage &img);
 
 //-----------------------------------------------------------------------------
 // Interface
 
-LVG_EXPORT void *vidgfx_tex_map(
+API_EXPORT void *vidgfx_tex_map(
 	VidgfxTex *tex);
-LVG_EXPORT void vidgfx_tex_unmap(
+API_EXPORT void vidgfx_tex_unmap(
 	VidgfxTex *tex);
 
-LVG_EXPORT bool vidgfx_tex_is_srgb_hack(
+API_EXPORT bool vidgfx_tex_is_srgb_hack(
 	VidgfxTex *tex);
 
 //=============================================================================
@@ -407,11 +400,11 @@ LVG_EXPORT bool vidgfx_tex_is_srgb_hack(
 //-----------------------------------------------------------------------------
 // Static methods
 
-LVG_EXPORT bool vidgfx_create_solid_rect(
+API_EXPORT bool vidgfx_create_solid_rect(
 	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QColor &col);
-LVG_EXPORT bool vidgfx_create_solid_rect(
+API_EXPORT bool vidgfx_create_solid_rect(
 	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QColor &tl_col,
@@ -419,12 +412,12 @@ LVG_EXPORT bool vidgfx_create_solid_rect(
 	const QColor &bl_col,
 	const QColor &br_col);
 
-LVG_EXPORT bool vidgfx_create_solid_rect_outline(
+API_EXPORT bool vidgfx_create_solid_rect_outline(
 	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QColor &col,
 	const QPointF &half_width = QPointF(0.5f, 0.5f));
-LVG_EXPORT bool vidgfx_create_solid_rect_outline(
+API_EXPORT bool vidgfx_create_solid_rect_outline(
 	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QColor &tl_col,
@@ -433,14 +426,14 @@ LVG_EXPORT bool vidgfx_create_solid_rect_outline(
 	const QColor &br_col,
 	const QPointF &half_width = QPointF(0.5f, 0.5f));
 
-LVG_EXPORT bool vidgfx_create_tex_decal_rect(
+API_EXPORT bool vidgfx_create_tex_decal_rect(
 	VidgfxVertBuf *out_buf,
 	const QRectF &rect);
-LVG_EXPORT bool vidgfx_create_tex_decal_rect(
+API_EXPORT bool vidgfx_create_tex_decal_rect(
 	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QPointF &br_uv);
-LVG_EXPORT bool vidgfx_create_tex_decal_rect(
+API_EXPORT bool vidgfx_create_tex_decal_rect(
 	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	const QPointF &tl_uv,
@@ -448,133 +441,133 @@ LVG_EXPORT bool vidgfx_create_tex_decal_rect(
 	const QPointF &bl_uv,
 	const QPointF &br_uv);
 
-LVG_EXPORT bool vidgfx_create_resize_rect(
+API_EXPORT bool vidgfx_create_resize_rect(
 	VidgfxVertBuf *out_buf,
 	const QRectF &rect,
 	float handle_size,
 	const QPointF &half_width = QPointF(0.5f, 0.5f));
 
 // Helpers
-LVG_EXPORT quint32 vidgfx_next_pow_two(
+API_EXPORT quint32 vidgfx_next_pow_two(
 	quint32 n);
 
 //-----------------------------------------------------------------------------
 // Methods
 
-LVG_EXPORT void vidgfx_context_set_view_mat(
+API_EXPORT void vidgfx_context_set_view_mat(
 	VidgfxContext *context,
 	const QMatrix4x4 &matrix);
-LVG_EXPORT QMatrix4x4 vidgfx_context_get_view_mat(
+API_EXPORT QMatrix4x4 vidgfx_context_get_view_mat(
 	VidgfxContext *context);
-LVG_EXPORT void vidgfx_context_set_proj_mat(
+API_EXPORT void vidgfx_context_set_proj_mat(
 	VidgfxContext *context,
 	const QMatrix4x4 &matrix);
-LVG_EXPORT QMatrix4x4 vidgfx_context_get_proj_mat(
-	VidgfxContext *context);
-
-LVG_EXPORT void vidgfx_context_set_screen_view_mat(
-	VidgfxContext *context,
-	const QMatrix4x4 &matrix);
-LVG_EXPORT QMatrix4x4 vidgfx_context_get_screen_view_mat(
-	VidgfxContext *context);
-LVG_EXPORT void vidgfx_context_set_screen_proj_mat(
-	VidgfxContext *context,
-	const QMatrix4x4 &matrix);
-LVG_EXPORT QMatrix4x4 vidgfx_context_get_screen_proj_mat(
+API_EXPORT QMatrix4x4 vidgfx_context_get_proj_mat(
 	VidgfxContext *context);
 
-LVG_EXPORT void vidgfx_context_set_user_render_target(
+API_EXPORT void vidgfx_context_set_screen_view_mat(
+	VidgfxContext *context,
+	const QMatrix4x4 &matrix);
+API_EXPORT QMatrix4x4 vidgfx_context_get_screen_view_mat(
+	VidgfxContext *context);
+API_EXPORT void vidgfx_context_set_screen_proj_mat(
+	VidgfxContext *context,
+	const QMatrix4x4 &matrix);
+API_EXPORT QMatrix4x4 vidgfx_context_get_screen_proj_mat(
+	VidgfxContext *context);
+
+API_EXPORT void vidgfx_context_set_user_render_target(
 	VidgfxContext *context,
 	VidgfxTex *tex_a,
 	VidgfxTex *tex_b = NULL);
-LVG_EXPORT VidgfxTex *vidgfx_context_get_user_render_target(
+API_EXPORT VidgfxTex *vidgfx_context_get_user_render_target(
 	VidgfxContext *context,
 	int index);
-LVG_EXPORT void vidgfx_context_set_user_render_target_viewport(
+API_EXPORT void vidgfx_context_set_user_render_target_viewport(
 	VidgfxContext *context,
 	const QRect &rect);
-LVG_EXPORT void vidgfx_context_set_user_render_target_viewport(
+API_EXPORT void vidgfx_context_set_user_render_target_viewport(
 	VidgfxContext *context,
 	const QSize &size);
-LVG_EXPORT QRect vidgfx_context_get_user_render_target_viewport(
+API_EXPORT QRect vidgfx_context_get_user_render_target_viewport(
 	VidgfxContext *context);
 
-LVG_EXPORT void vidgfx_context_set_resize_layer_rect(
+API_EXPORT void vidgfx_context_set_resize_layer_rect(
 	VidgfxContext *context,
 	const QRectF &rect);
-LVG_EXPORT QRectF vidgfx_context_get_resize_layer_rect(
+API_EXPORT QRectF vidgfx_context_get_resize_layer_rect(
 	VidgfxContext *context);
 
-LVG_EXPORT void vidgfx_context_set_rgb_nv16_px_size(
+API_EXPORT void vidgfx_context_set_rgb_nv16_px_size(
 	VidgfxContext *context,
 	const QPointF &size);
-LVG_EXPORT QPointF vidgfx_context_get_rgb_nv16_px_size(
+API_EXPORT QPointF vidgfx_context_get_rgb_nv16_px_size(
 	VidgfxContext *context);
 
-LVG_EXPORT void vidgfx_context_set_tex_decal_mod_color(
+API_EXPORT void vidgfx_context_set_tex_decal_mod_color(
 	VidgfxContext *context,
 	const QColor &color);
-LVG_EXPORT QColor vidgfx_context_get_tex_decal_mod_color(
+API_EXPORT QColor vidgfx_context_get_tex_decal_mod_color(
 	VidgfxContext *context);
 
-LVG_EXPORT void vidgfx_context_set_tex_decal_effects(
+API_EXPORT void vidgfx_context_set_tex_decal_effects(
 	VidgfxContext *context,
 	float gamma,
 	float brightness,
 	float contrast,
 	float saturation);
-LVG_EXPORT bool vidgfx_context_set_tex_decal_effects_helper(
+API_EXPORT bool vidgfx_context_set_tex_decal_effects_helper(
 	VidgfxContext *context,
 	float gamma,
 	int brightness,
 	int contrast,
 	int saturation);
-LVG_EXPORT const float *vidgfx_context_get_tex_decal_effects(
+API_EXPORT const float *vidgfx_context_get_tex_decal_effects(
 	VidgfxContext *context);
 
-LVG_EXPORT bool vidgfx_context_dilute_img(
+API_EXPORT bool vidgfx_context_dilute_img(
 	VidgfxContext *context,
 	QImage &img);
 
 //-----------------------------------------------------------------------------
 // Interface
 
-LVG_EXPORT bool vidgfx_context_is_valid(
+API_EXPORT bool vidgfx_context_is_valid(
 	VidgfxContext *context);
-LVG_EXPORT void vidgfx_context_flush(
+API_EXPORT void vidgfx_context_flush(
 	VidgfxContext *context);
 
 // Buffers
-LVG_EXPORT VidgfxVertBuf *vidgfx_context_new_vertbuf(
+API_EXPORT VidgfxVertBuf *vidgfx_context_new_vertbuf(
 	VidgfxContext *context,
 	int size);
-LVG_EXPORT void vidgfx_context_destroy_vertbuf(
+API_EXPORT void vidgfx_context_destroy_vertbuf(
 	VidgfxContext *context,
 	VidgfxVertBuf *buf);
-LVG_EXPORT VidgfxTex *vidgfx_context_new_tex(
+API_EXPORT VidgfxTex *vidgfx_context_new_tex(
 	VidgfxContext *context,
 	QImage img,
 	bool writable = false,
 	bool targetable = false);
-LVG_EXPORT VidgfxTex *vidgfx_context_new_tex(
+API_EXPORT VidgfxTex *vidgfx_context_new_tex(
 	VidgfxContext *context,
 	const QSize &size,
 	bool writable = false,
 	bool targetable = false,
 	bool use_bgra = false);
-LVG_EXPORT VidgfxTex *vidgfx_context_new_tex(
+API_EXPORT VidgfxTex *vidgfx_context_new_tex(
 	VidgfxContext *context,
 	const QSize &size,
 	VidgfxTex *same_format,
 	bool writable = false,
 	bool targetable = false);
-LVG_EXPORT VidgfxTex *vidgfx_context_new_staging_tex(
+API_EXPORT VidgfxTex *vidgfx_context_new_staging_tex(
 	VidgfxContext *context,
 	const QSize &size);
-LVG_EXPORT void vidgfx_context_destroy_tex(
+API_EXPORT void vidgfx_context_destroy_tex(
 	VidgfxContext *context,
 	VidgfxTex *tex);
-LVG_EXPORT bool vidgfx_context_copy_tex_data(
+API_EXPORT bool vidgfx_context_copy_tex_data(
 	VidgfxContext *context,
 	VidgfxTex *dst,
 	VidgfxTex *src,
@@ -582,27 +575,27 @@ LVG_EXPORT bool vidgfx_context_copy_tex_data(
 	const QRect &src_rect);
 
 // Render targets
-LVG_EXPORT void vidgfx_context_resize_screen_target(
+API_EXPORT void vidgfx_context_resize_screen_target(
 	VidgfxContext *context,
 	const QSize &new_size);
-LVG_EXPORT void vidgfx_context_resize_canvas_target(
+API_EXPORT void vidgfx_context_resize_canvas_target(
 	VidgfxContext *context,
 	const QSize &new_size);
-LVG_EXPORT void vidgfx_context_resize_scratch_target(
+API_EXPORT void vidgfx_context_resize_scratch_target(
 	VidgfxContext *context,
 	const QSize &new_size);
-LVG_EXPORT void vidgfx_context_swap_screen_bufs(
+API_EXPORT void vidgfx_context_swap_screen_bufs(
 	VidgfxContext *context);
-LVG_EXPORT VidgfxTex *vidgfx_context_get_target_tex(
+API_EXPORT VidgfxTex *vidgfx_context_get_target_tex(
 	VidgfxContext *context,
 	VidgfxRendTarget target);
-LVG_EXPORT GfxRenderTarget vidgfx_context_get_next_scratch_target(
+API_EXPORT VidgfxRendTarget vidgfx_context_get_next_scratch_target(
 	VidgfxContext *context);
-LVG_EXPORT QPointF vidgfx_context_get_scratch_target_to_tex_ratio(
+API_EXPORT QPointF vidgfx_context_get_scratch_target_to_tex_ratio(
 	VidgfxContext *context);
 
 // Advanced rendering
-LVG_EXPORT VidgfxTex *vidgfx_context_prepare_tex(
+API_EXPORT VidgfxTex *vidgfx_context_prepare_tex(
 	VidgfxContext *context,
 	VidgfxTex *tex,
 	const QSize &size,
@@ -610,7 +603,7 @@ LVG_EXPORT VidgfxTex *vidgfx_context_prepare_tex(
 	bool set_filter,
 	QPointF &px_size_out,
 	QPointF &bot_right_out);
-LVG_EXPORT VidgfxTex *vidgfx_context_prepare_tex(
+API_EXPORT VidgfxTex *vidgfx_context_prepare_tex(
 	VidgfxContext *context,
 	VidgfxTex *tex,
 	const QRect &crop_rect,
@@ -620,7 +613,7 @@ LVG_EXPORT VidgfxTex *vidgfx_context_prepare_tex(
 	QPointF &px_size_out,
 	QPointF &top_left_out,
 	QPointF &bot_right_out);
-LVG_EXPORT VidgfxTex *vidgfx_context_convert_to_bgrx(
+API_EXPORT VidgfxTex *vidgfx_context_convert_to_bgrx(
 	VidgfxContext *context,
 	VidgfxPixFormat format,
 	VidgfxTex *plane_a,
@@ -628,30 +621,30 @@ LVG_EXPORT VidgfxTex *vidgfx_context_convert_to_bgrx(
 	VidgfxTex *plane_c);
 
 // Drawing
-LVG_EXPORT void vidgfx_context_set_render_target(
+API_EXPORT void vidgfx_context_set_render_target(
 	VidgfxContext *context,
 	VidgfxRendTarget target);
-LVG_EXPORT void vidgfx_context_set_shader(
+API_EXPORT void vidgfx_context_set_shader(
 	VidgfxContext *context,
 	VidgfxShader shader);
-LVG_EXPORT void vidgfx_context_set_topology(
+API_EXPORT void vidgfx_context_set_topology(
 	VidgfxContext *context,
 	VidgfxTopology topology);
-LVG_EXPORT void vidgfx_context_set_blending(
+API_EXPORT void vidgfx_context_set_blending(
 	VidgfxContext *context,
 	VidgfxBlending blending);
-LVG_EXPORT void vidgfx_context_set_tex(
+API_EXPORT void vidgfx_context_set_tex(
 	VidgfxContext *context,
 	VidgfxTex *tex_a,
 	VidgfxTex *tex_b = NULL,
 	VidgfxTex *tex_c = NULL);
-LVG_EXPORT void vidgfx_context_set_tex_filter(
+API_EXPORT void vidgfx_context_set_tex_filter(
 	VidgfxContext *context,
 	VidgfxFilter filter);
-LVG_EXPORT void vidgfx_context_clear(
+API_EXPORT void vidgfx_context_clear(
 	VidgfxContext *context,
 	const QColor &color);
-LVG_EXPORT void vidgfx_context_draw_buf(
+API_EXPORT void vidgfx_context_draw_buf(
 	VidgfxContext *context,
 	VidgfxVertBuf *buf,
 	int num_vertices = -1,
@@ -665,19 +658,19 @@ typedef void VidgfxContextInitializedCallback(
 typedef void VidgfxContextDestroyingCallback(
 	void *opaque, VidgfxContext *context);
 
-LVG_EXPORT void vidgfx_context_add_initialized_callback(
+API_EXPORT void vidgfx_context_add_initialized_callback(
 	VidgfxContext *context,
 	VidgfxContextInitializedCallback *initialized,
 	void *opaque);
-LVG_EXPORT void vidgfx_context_remove_initialized_callback(
+API_EXPORT void vidgfx_context_remove_initialized_callback(
 	VidgfxContext *context,
 	VidgfxContextInitializedCallback *initialized,
 	void *opaque);
-LVG_EXPORT void vidgfx_context_add_destroying_callback(
+API_EXPORT void vidgfx_context_add_destroying_callback(
 	VidgfxContext *context,
 	VidgfxContextDestroyingCallback *destroying,
 	void *opaque);
-LVG_EXPORT void vidgfx_context_remove_destroying_callback(
+API_EXPORT void vidgfx_context_remove_destroying_callback(
 	VidgfxContext *context,
 	VidgfxContextDestroyingCallback *destroying,
 	void *opaque);
@@ -690,17 +683,17 @@ LVG_EXPORT void vidgfx_context_remove_destroying_callback(
 //-----------------------------------------------------------------------------
 // Constructor/destructor
 
-LVG_EXPORT VidgfxD3DTex *vidgfx_tex_get_d3dtex(
+API_EXPORT VidgfxD3DTex *vidgfx_tex_get_d3dtex(
 	VidgfxTex *tex);
-LVG_EXPORT VidgfxTex *vidgfx_d3dtex_get_tex(
+API_EXPORT VidgfxTex *vidgfx_d3dtex_get_tex(
 	VidgfxD3DTex *tex);
 
 //-----------------------------------------------------------------------------
 // Methods
 
-LVG_EXPORT HDC vidgfx_d3dtex_get_dc(
+API_EXPORT HDC vidgfx_d3dtex_get_dc(
 	VidgfxD3DTex *tex);
-LVG_EXPORT void vidgfx_d3dtex_release_dc(
+API_EXPORT void vidgfx_d3dtex_release_dc(
 	VidgfxD3DTex *tex);
 
 #endif // VIDGFX_D3D_ENABLED
@@ -717,46 +710,46 @@ struct IDXGIFactory1; // DXGI 1.1
 //-----------------------------------------------------------------------------
 // Static methods
 
-LVG_EXPORT HRESULT vidgfx_d3d_create_dxgifactory1_dyn(
+API_EXPORT HRESULT vidgfx_d3d_create_dxgifactory1_dyn(
 	IDXGIFactory1 **factory_out);
-LVG_EXPORT void vidgfx_d3d_log_display_adapters();
+API_EXPORT void vidgfx_d3d_log_display_adapters();
 
 //-----------------------------------------------------------------------------
 // Constructor/destructor
 
-LVG_EXPORT VidgfxD3DContext *vidgfx_d3dcontext_new();
-LVG_EXPORT void vidgfx_d3dcontext_destroy(
+API_EXPORT VidgfxD3DContext *vidgfx_d3dcontext_new();
+API_EXPORT void vidgfx_d3dcontext_destroy(
 	VidgfxD3DContext *context);
 
-LVG_EXPORT VidgfxD3DContext *vidgfx_context_get_d3dcontext(
+API_EXPORT VidgfxD3DContext *vidgfx_context_get_d3dcontext(
 	VidgfxContext *context);
-LVG_EXPORT VidgfxContext *vidgfx_d3dcontext_get_context(
+API_EXPORT VidgfxContext *vidgfx_d3dcontext_get_context(
 	VidgfxD3DContext *context);
 
 //-----------------------------------------------------------------------------
 // Methods
 
-LVG_EXPORT bool vidgfx_d3dcontext_is_valid(
+API_EXPORT bool vidgfx_d3dcontext_is_valid(
 	VidgfxD3DContext *context);
 
-LVG_EXPORT bool vidgfx_d3dcontext_init(
+API_EXPORT bool vidgfx_d3dcontext_init(
 	VidgfxD3DContext *context,
 	HWND hwnd,
 	const QSize &size,
 	const QColor &resize_border_col);
-LVG_EXPORT ID3D10Device *vidgfx_d3dcontext_get_device(
+API_EXPORT ID3D10Device *vidgfx_d3dcontext_get_device(
 	VidgfxD3DContext *context);
-LVG_EXPORT bool vidgfx_d3dcontext_has_dxgi11(
+API_EXPORT bool vidgfx_d3dcontext_has_dxgi11(
 	VidgfxD3DContext *context);
-LVG_EXPORT bool vidgfx_d3dcontext_has_bgra_tex_support(
+API_EXPORT bool vidgfx_d3dcontext_has_bgra_tex_support(
 	VidgfxD3DContext *context);
-LVG_EXPORT VidgfxTex *vidgfx_d3dcontext_new_gdi_tex(
+API_EXPORT VidgfxTex *vidgfx_d3dcontext_new_gdi_tex(
 	VidgfxD3DContext *context,
 	const QSize &size);
-LVG_EXPORT VidgfxTex *vidgfx_d3dcontext_open_shared_tex(
+API_EXPORT VidgfxTex *vidgfx_d3dcontext_open_shared_tex(
 	VidgfxD3DContext *context,
 	HANDLE shared_handle);
-LVG_EXPORT VidgfxTex *vidgfx_d3dcontext_open_dx10_tex(
+API_EXPORT VidgfxTex *vidgfx_d3dcontext_open_dx10_tex(
 	VidgfxD3DContext *context,
 	ID3D10Texture2D *tex);
 
@@ -768,23 +761,25 @@ typedef void VidgfxD3DContextDxgi11ChangedCallback(
 typedef void VidgfxD3DContextBgraTexSupportChangedCallback(
 	void *opaque, VidgfxD3DContext *context, bool has_bgra_tex_support);
 
-LVG_EXPORT void vidgfx_d3dcontext_add_dxgi11_changed_callback(
+API_EXPORT void vidgfx_d3dcontext_add_dxgi11_changed_callback(
 	VidgfxD3DContext *context,
 	VidgfxD3DContextDxgi11ChangedCallback *dxgi11_changed,
 	void *opaque);
-LVG_EXPORT void vidgfx_d3dcontext_remove_dxgi11_changed_callback(
+API_EXPORT void vidgfx_d3dcontext_remove_dxgi11_changed_callback(
 	VidgfxD3DContext *context,
 	VidgfxD3DContextDxgi11ChangedCallback *dxgi11_changed,
 	void *opaque);
-LVG_EXPORT void vidgfx_d3dcontext_add_bgra_tex_support_changed_callback(
+API_EXPORT void vidgfx_d3dcontext_add_bgra_tex_support_changed_callback(
 	VidgfxD3DContext *context,
 	VidgfxD3DContextBgraTexSupportChangedCallback *bgra_tex_support_changed,
 	void *opaque);
-LVG_EXPORT void vidgfx_d3dcontext_remove_bgra_tex_support_changed_callback(
+API_EXPORT void vidgfx_d3dcontext_remove_bgra_tex_support_changed_callback(
 	VidgfxD3DContext *context,
 	VidgfxD3DContextBgraTexSupportChangedCallback *bgra_tex_support_changed,
 	void *opaque);
 
 #endif // VIDGFX_D3D_ENABLED
+
+#undef API_EXPORT
 
 #endif // LIBVIDGFX_H

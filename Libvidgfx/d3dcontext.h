@@ -43,7 +43,7 @@ enum DXGI_FORMAT;
 class D3DContext;
 
 //=============================================================================
-class LVG_EXPORT D3DVertexBuffer : public VertexBuffer
+class D3DVertexBuffer : public VertexBuffer
 {
 private: // Members -----------------------------------------------------------
 	D3DContext *	m_context;
@@ -66,7 +66,7 @@ inline ID3D10Buffer *D3DVertexBuffer::getBuffer() const
 }
 
 //=============================================================================
-class LVG_EXPORT D3DTexture : public Texture
+class D3DTexture : public Texture
 {
 protected: // Members ---------------------------------------------------------
 	ID3D10Texture2D *			m_tex;
@@ -128,7 +128,7 @@ inline bool D3DTexture::doBgraSwizzle() const
 }
 
 //=============================================================================
-class LVG_EXPORT D3DContext : public GraphicsContext
+class D3DContext : public GraphicsContext
 {
 	Q_OBJECT
 
@@ -193,7 +193,7 @@ private: // Members -----------------------------------------------------------
 	quint32						m_texDecalFlags;
 
 	// Shaders
-	GfxShader					m_boundShader;
+	VidgfxShader				m_boundShader;
 	ID3D10VertexShader *		m_solidVS;
 	ID3D10PixelShader *			m_solidPS;
 	ID3D10InputLayout *			m_solidIL;
@@ -279,34 +279,34 @@ public: // Interface ----------------------------------------------------------
 		const QRect &srcRect);
 
 	// Render targets
-	virtual void			resizeScreenTarget(const QSize &newSize);
-	virtual void			resizeCanvasTarget(const QSize &newSize);
-	virtual void			resizeScratchTarget(const QSize &newSize);
-	virtual void			swapScreenBuffers();
-	virtual	Texture *		getTargetTexture(GfxRenderTarget target);
-	virtual GfxRenderTarget	getNextScratchTarget();
-	virtual QPointF			getScratchTargetToTextureRatio();
+	virtual void				resizeScreenTarget(const QSize &newSize);
+	virtual void				resizeCanvasTarget(const QSize &newSize);
+	virtual void				resizeScratchTarget(const QSize &newSize);
+	virtual void				swapScreenBuffers();
+	virtual	Texture *			getTargetTexture(VidgfxRendTarget target);
+	virtual VidgfxRendTarget	getNextScratchTarget();
+	virtual QPointF				getScratchTargetToTextureRatio();
 
 	// Advanced rendering
 	virtual Texture *	prepareTexture(
-		Texture *tex, const QSize &size, GfxFilter filter, bool setFilter,
+		Texture *tex, const QSize &size, VidgfxFilter filter, bool setFilter,
 		QPointF &pxSizeOut, QPointF &botRightOut);
 	virtual Texture *	prepareTexture(
 		Texture *tex, const QRect &cropRect, const QSize &size,
-		GfxFilter filter, bool setFilter, QPointF &pxSizeOut,
+		VidgfxFilter filter, bool setFilter, QPointF &pxSizeOut,
 		QPointF &topLeftOut, QPointF &botRightOut);
 	virtual Texture *	convertToBgrx(
-		GfxPixelFormat format, Texture *planeA, Texture *planeB,
+		VidgfxPixFormat format, Texture *planeA, Texture *planeB,
 		Texture *planeC);
 
 	// Drawing
-	virtual void		setRenderTarget(GfxRenderTarget target);
-	virtual void		setShader(GfxShader shader);
-	virtual void		setTopology(GfxTopology topology);
-	virtual void		setBlending(GfxBlending blending);
+	virtual void		setRenderTarget(VidgfxRendTarget target);
+	virtual void		setShader(VidgfxShader shader);
+	virtual void		setTopology(VidgfxTopology topology);
+	virtual void		setBlending(VidgfxBlending blending);
 	virtual void		setTexture(
 		Texture *texA, Texture *texB = NULL, Texture *texC = NULL);
-	virtual void		setTextureFilter(GfxFilter filter);
+	virtual void		setTextureFilter(VidgfxFilter filter);
 	virtual void		clear(const QColor &color);
 	virtual void		drawBuffer(
 		VertexBuffer *buf, int numVertices = -1, int startVertex = 0);
