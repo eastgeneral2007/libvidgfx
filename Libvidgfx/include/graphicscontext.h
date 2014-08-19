@@ -110,9 +110,9 @@ class LVG_EXPORT TexDecalVertBuf
 private: // Constants ---------------------------------------------------------
 
 	// Buffer information for `createTexDecalRect()` (1 vertex = 8 floats)
-	static const int	ScrollRectNumVerts = 4 * 6; // 4 rects of 6 verts
-	static const int	ScrollRectNumFloats = ScrollRectNumVerts * 8;
-	static const int	ScrollRectBufSize = ScrollRectNumFloats * sizeof(float);
+	static const int	ScrollRectNumVerts = VIDGFX_SCROLL_RECT_NUM_VERTS;
+	static const int	ScrollRectNumFloats = VIDGFX_SCROLL_RECT_NUM_FLOATS;
+	static const int	ScrollRectBufSize = VIDGFX_SCROLL_RECT_BUF_SIZE;
 
 protected: // Members ---------------------------------------------------------
 	GraphicsContext *	m_context;
@@ -317,30 +317,30 @@ private: // Datatypes ---------------------------------------------------------
 public: // Constants ----------------------------------------------------------
 
 	// The number of vertices required to represent one line
-	static const int	NumVertsPerLine = 6;
+	static const int	NumVertsPerLine = VIDGFX_NUM_VERTS_PER_LINE;
 
 	// The number of vertices required to represent one rectangle
-	static const int	NumVertsPerRect = 4 * NumVertsPerLine;
+	static const int	NumVertsPerRect = VIDGFX_NUM_VERTS_PER_RECT;
 
 	// Buffer information for `createSolidRect()` (1 vertex = 8 floats)
-	static const int	SolidRectNumVerts = 4;
-	static const int	SolidRectNumFloats = SolidRectNumVerts * 8;
-	static const int	SolidRectBufSize = SolidRectNumFloats * sizeof(float);
+	static const int	SolidRectNumVerts = VIDGFX_SOLID_RECT_NUM_VERTS;
+	static const int	SolidRectNumFloats = VIDGFX_SOLID_RECT_NUM_FLOATS;
+	static const int	SolidRectBufSize = VIDGFX_SOLID_RECT_BUF_SIZE;
 
 	// Buffer information for `createSolidRectOutline()` (1 vertex = 8 floats)
-	static const int	SolidRectOutlineNumVerts = NumVertsPerRect;
-	static const int	SolidRectOutlineNumFloats = SolidRectOutlineNumVerts * 8;
-	static const int	SolidRectOutlineBufSize = SolidRectOutlineNumFloats * sizeof(float);
+	static const int	SolidRectOutlineNumVerts = VIDGFX_SOLID_RECT_OUTLINE_NUM_VERTS;
+	static const int	SolidRectOutlineNumFloats = VIDGFX_SOLID_RECT_OUTLINE_NUM_FLOATS;
+	static const int	SolidRectOutlineBufSize = VIDGFX_SOLID_RECT_OUTLINE_BUF_SIZE;
 
 	// Buffer information for `createTexDecalRect()` (1 vertex = 8 floats)
-	static const int	TexDecalRectNumVerts = 4;
-	static const int	TexDecalRectNumFloats = TexDecalRectNumVerts * 8;
-	static const int	TexDecalRectBufSize = TexDecalRectNumFloats * sizeof(float);
+	static const int	TexDecalRectNumVerts = VIDGFX_TEX_DECAL_RECT_NUM_VERTS;
+	static const int	TexDecalRectNumFloats = VIDGFX_TEX_DECAL_RECT_NUM_FLOATS;
+	static const int	TexDecalRectBufSize = VIDGFX_TEX_DECAL_RECT_BUF_SIZE;
 
 	// Buffer information for `createResizeRect()` (1 vertex = 4 floats)
-	static const int	ResizeRectNumVerts = 10 * NumVertsPerRect;
-	static const int	ResizeRectNumFloats = ResizeRectNumVerts * 4;
-	static const int	ResizeRectBufSize = ResizeRectNumFloats * sizeof(float);
+	static const int	ResizeRectNumVerts = VIDGFX_RESIZE_RECT_NUM_VERTS;
+	static const int	ResizeRectNumFloats = VIDGFX_RESIZE_RECT_NUM_FLOATS;
+	static const int	ResizeRectBufSize = VIDGFX_RESIZE_RECT_BUF_SIZE;
 
 protected: // Members ---------------------------------------------------------
 	GfxRenderTarget	m_currentTarget;

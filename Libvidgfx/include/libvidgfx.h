@@ -258,6 +258,13 @@ LVG_EXPORT bool vidgfx_vertbuf_is_dirty(
 //=============================================================================
 // TexDecalVertBuf C interface
 
+// Buffer information for `vidgfx_create_tex_decal_rect()`. 4 rectangles of 6
+// vertices where each vertex is 8 floats.
+#define VIDGFX_SCROLL_RECT_NUM_VERTS (4 * 6)
+#define VIDGFX_SCROLL_RECT_NUM_FLOATS (VIDGFX_SCROLL_RECT_NUM_VERTS * 8)
+#define VIDGFX_SCROLL_RECT_BUF_SIZE \
+	(VIDGFX_SCROLL_RECT_NUM_FLOATS * sizeof(float))
+
 //-----------------------------------------------------------------------------
 // Constructor/destructor
 
@@ -370,6 +377,37 @@ LVG_EXPORT bool vidgfx_tex_is_srgb_hack(
 
 //=============================================================================
 // GraphicsContext C interface
+
+// The number of vertices required to represent one line
+#define VIDGFX_NUM_VERTS_PER_LINE (6)
+
+// The number of vertices required to represent one rectangle
+#define VIDGFX_NUM_VERTS_PER_RECT (4 * VIDGFX_NUM_VERTS_PER_LINE)
+
+// Buffer information for `createSolidRect()` (1 vertex = 8 floats)
+#define VIDGFX_SOLID_RECT_NUM_VERTS (4)
+#define VIDGFX_SOLID_RECT_NUM_FLOATS (VIDGFX_SOLID_RECT_NUM_VERTS * 8)
+#define VIDGFX_SOLID_RECT_BUF_SIZE \
+	(VIDGFX_SOLID_RECT_NUM_FLOATS * sizeof(float))
+
+// Buffer information for `createSolidRectOutline()` (1 vertex = 8 floats)
+#define VIDGFX_SOLID_RECT_OUTLINE_NUM_VERTS (VIDGFX_NUM_VERTS_PER_RECT)
+#define VIDGFX_SOLID_RECT_OUTLINE_NUM_FLOATS \
+	(VIDGFX_SOLID_RECT_OUTLINE_NUM_VERTS * 8)
+#define VIDGFX_SOLID_RECT_OUTLINE_BUF_SIZE \
+	(VIDGFX_SOLID_RECT_OUTLINE_NUM_FLOATS * sizeof(float))
+
+// Buffer information for `createTexDecalRect()` (1 vertex = 8 floats)
+#define VIDGFX_TEX_DECAL_RECT_NUM_VERTS (4)
+#define VIDGFX_TEX_DECAL_RECT_NUM_FLOATS (VIDGFX_TEX_DECAL_RECT_NUM_VERTS * 8)
+#define VIDGFX_TEX_DECAL_RECT_BUF_SIZE \
+	(VIDGFX_TEX_DECAL_RECT_NUM_FLOATS * sizeof(float))
+
+// Buffer information for `createResizeRect()` (1 vertex = 4 floats)
+#define VIDGFX_RESIZE_RECT_NUM_VERTS (10 * VIDGFX_NUM_VERTS_PER_RECT)
+#define VIDGFX_RESIZE_RECT_NUM_FLOATS (VIDGFX_RESIZE_RECT_NUM_VERTS * 4)
+#define VIDGFX_RESIZE_RECT_BUF_SIZE \
+	(VIDGFX_RESIZE_RECT_NUM_FLOATS * sizeof(float))
 
 //-----------------------------------------------------------------------------
 // Static methods
