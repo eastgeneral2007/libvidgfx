@@ -16,7 +16,7 @@
 //*****************************************************************************
 
 #include "include/libvidgfx.h"
-#include "include/graphicscontext.h"
+#include "include/d3dcontext.h"
 #include <iostream>
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -911,3 +911,153 @@ void vidgfx_context_remove_destroying_callback(
 {
 	context->removeDestroyingCallback(destroying, opaque);
 }
+
+//=============================================================================
+// D3DContext C API
+
+#if VIDGFX_D3D_ENABLED
+
+//-----------------------------------------------------------------------------
+// Static methods
+
+HRESULT vidgfx_d3d_create_dxgifactory1_dyn(
+	IDXGIFactory1 **factory_out)
+{
+	return D3DContext::createDXGIFactory1Dynamic(factory_out);
+}
+
+void vidgfx_d3d_log_display_adapters()
+{
+	D3DContext::logDisplayAdapters();
+}
+
+//-----------------------------------------------------------------------------
+// Constructor/destructor
+
+VidgfxD3DContext *vidgfx_d3dcontext_new()
+{
+	D3DContext *d3dContext = new D3DContext();
+	return static_cast<VidgfxD3DContext *>(d3dContext);
+}
+
+void vidgfx_d3dcontext_destroy(
+	VidgfxD3DContext *context)
+{
+	D3DContext *d3dContext = static_cast<D3DContext *>(context);
+	if(d3dContext != NULL)
+		delete d3dContext;
+}
+
+VidgfxD3DContext *vidgfx_context_get_d3dcontext(
+	VidgfxContext *context)
+{
+	GraphicsContext *gfx = static_cast<GraphicsContext *>(context);
+	D3DContext *d3dContext = static_cast<D3DContext *>(gfx);
+	return static_cast<VidgfxD3DContext *>(d3dContext);
+}
+
+VidgfxContext *vidgfx_d3dcontext_get_context(
+	VidgfxD3DContext *context)
+{
+	D3DContext *d3dContext = static_cast<D3DContext *>(context);
+	GraphicsContext *gfx = static_cast<GraphicsContext *>(d3dContext);
+	return static_cast<VidgfxContext *>(gfx);
+}
+
+//-----------------------------------------------------------------------------
+// Methods
+
+bool vidgfx_d3dcontext_is_valid(
+	VidgfxD3DContext *context)
+{
+	if(context == NULL)
+		return false;
+	return context->isValid();
+}
+
+bool vidgfx_d3dcontext_init(
+	VidgfxD3DContext *context,
+	HWND hwnd,
+	const QSize &size,
+	const QColor &resize_border_col)
+{
+	return context->initialize(hwnd, size, resize_border_col);
+}
+
+ID3D10Device *vidgfx_d3dcontext_get_device(
+	VidgfxD3DContext *context)
+{
+	return context->getDevice();
+}
+
+bool vidgfx_d3dcontext_has_dxgi11(
+	VidgfxD3DContext *context)
+{
+	return context->hasDxgi11();
+}
+
+bool vidgfx_d3dcontext_has_bgra_tex_support(
+	VidgfxD3DContext *context)
+{
+	return context->hasBgraTexSupport();
+}
+
+VidgfxTex *vidgfx_d3dcontext_new_gdi_tex(
+	VidgfxD3DContext *context,
+	const QSize &size)
+{
+	return context->createGDITexture(size);
+}
+
+VidgfxTex *vidgfx_d3dcontext_open_shared_tex(
+	VidgfxD3DContext *context,
+	HANDLE shared_handle)
+{
+	return context->openSharedTexture(shared_handle);
+}
+
+VidgfxTex *vidgfx_d3dcontext_open_dx10_tex(
+	VidgfxD3DContext *context,
+	ID3D10Texture2D *tex)
+{
+	return context->openDX10Texture(tex);
+}
+
+//-----------------------------------------------------------------------------
+// Signals
+
+void vidgfx_d3dcontext_add_dxgi11_changed_callback(
+	VidgfxD3DContext *context,
+	VidgfxD3DContextDxgi11ChangedCallback *dxgi11_changed,
+	void *opaque)
+{
+	context->addDxgi11ChangedCallback(dxgi11_changed, opaque);
+}
+
+void vidgfx_d3dcontext_remove_dxgi11_changed_callback(
+	VidgfxD3DContext *context,
+	VidgfxD3DContextDxgi11ChangedCallback *dxgi11_changed,
+	void *opaque)
+{
+	context->removeDxgi11ChangedCallback(dxgi11_changed, opaque);
+}
+
+void vidgfx_d3dcontext_add_bgra_tex_support_changed_callback(
+	VidgfxD3DContext *context,
+	VidgfxD3DContextBgraTexSupportChangedCallback *bgra_tex_support_changed,
+	void *opaque)
+{
+	context->addBgraTexSupportChangedCallback(
+		bgra_tex_support_changed, opaque);
+}
+
+void vidgfx_d3dcontext_remove_bgra_tex_support_changed_callback(
+	VidgfxD3DContext *context,
+	VidgfxD3DContextBgraTexSupportChangedCallback *bgra_tex_support_changed,
+	void *opaque)
+{
+	context->removeBgraTexSupportChangedCallback(
+		bgra_tex_support_changed, opaque);
+}
+
+#endif // VIDGFX_D3D_ENABLED

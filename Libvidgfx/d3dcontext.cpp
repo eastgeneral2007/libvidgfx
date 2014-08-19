@@ -815,6 +815,10 @@ D3DContext::D3DContext()
 
 	// Advanced rendering
 	, m_mipmapBuf(NULL)
+
+	// Callbacks
+	, m_dxgi11ChangedCallbackList()
+	, m_bgraTexSupportChangedCallbackList()
 {
 	memset(m_cameraConstantsLocal, 0, sizeof(m_cameraConstantsLocal));
 	memset(m_resizeConstantsLocal, 0, sizeof(m_resizeConstantsLocal));
@@ -1404,6 +1408,7 @@ bool D3DContext::hasDxgi11()
 	m_hasDxgi11Valid = true;
 
 	// Notify that the value has potentially changed
+	callDxgi11ChangedCallbacks(m_hasDxgi11);
 	emit hasDxgi11Changed(m_hasDxgi11);
 
 	// Test for BGRA texture support if we haven't done already in order for it
@@ -1444,6 +1449,7 @@ bool D3DContext::hasBgraTexSupport()
 #endif // FORCE_NO_BGRA_SUPPORT
 
 	// Notify that the value has potentially changed
+	callBgraTexSupportChangedCallbacks(m_hasBgraTexSupport);
 	emit hasBgraTexSupportChanged(m_hasBgraTexSupport);
 
 	return m_hasBgraTexSupport;
@@ -2956,4 +2962,64 @@ void D3DContext::drawBuffer(
 
 	// Actually send the draw command
 	m_device->Draw(numVertices, startVertex);
+}
+
+void D3DContext::callDxgi11ChangedCallbacks(bool hasDxgi11)
+{
+	for(int i = 0; i < m_dxgi11ChangedCallbackList.size(); i++) {
+		const Dxgi11ChangedCallback &callback =
+			m_dxgi11ChangedCallbackList.at(i);
+		callback.callback(callback.opaque, this, hasDxgi11);
+	}
+}
+
+void D3DContext::addDxgi11ChangedCallback(
+	VidgfxD3DContextDxgi11ChangedCallback *dxgi11_changed, void *opaque)
+{
+	Dxgi11ChangedCallback callback;
+	callback.callback = dxgi11_changed;
+	callback.opaque = opaque;
+	m_dxgi11ChangedCallbackList.append(callback);
+}
+
+void D3DContext::removeDxgi11ChangedCallback(
+	VidgfxD3DContextDxgi11ChangedCallback *dxgi11_changed, void *opaque)
+{
+	Dxgi11ChangedCallback callback;
+	callback.callback = dxgi11_changed;
+	callback.opaque = opaque;
+	int id = m_dxgi11ChangedCallbackList.indexOf(callback);
+	if(id >= 0)
+		m_dxgi11ChangedCallbackList.remove(id);
+}
+
+void D3DContext::callBgraTexSupportChangedCallbacks(bool hasBgraTexSupport)
+{
+	for(int i = 0; i < m_bgraTexSupportChangedCallbackList.size(); i++) {
+		const BgraTexSupportChangedCallback &callback =
+			m_bgraTexSupportChangedCallbackList.at(i);
+		callback.callback(callback.opaque, this, hasBgraTexSupport);
+	}
+}
+
+void D3DContext::addBgraTexSupportChangedCallback(
+	VidgfxD3DContextBgraTexSupportChangedCallback *bgra_tex_support_changed,
+	void *opaque)
+{
+	BgraTexSupportChangedCallback callback;
+	callback.callback = bgra_tex_support_changed;
+	callback.opaque = opaque;
+	m_bgraTexSupportChangedCallbackList.append(callback);
+}
+
+void D3DContext::removeBgraTexSupportChangedCallback(
+	VidgfxD3DContextBgraTexSupportChangedCallback *bgra_tex_support_changed,
+	void *opaque)
+{
+	BgraTexSupportChangedCallback callback;
+	callback.callback = bgra_tex_support_changed;
+	callback.opaque = opaque;
+	int id = m_bgraTexSupportChangedCallbackList.indexOf(callback);
+	if(id >= 0)
+		m_bgraTexSupportChangedCallbackList.remove(id);
 }

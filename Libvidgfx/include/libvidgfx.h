@@ -18,10 +18,24 @@
 #ifndef LIBVIDGFX_H
 #define LIBVIDGFX_H
 
+#include <QtCore/qglobal.h>
+
+#ifdef Q_OS_WIN
+#define VIDGFX_D3D_ENABLED 1
+#else
+#define VIDGFX_D3D_ENABLED 0
+#endif
+#if !VIDGFX_D3D_ENABLED
+#error Unsupported system
+#endif
+
 #include <QtCore/QRect>
 #include <QtCore/QString>
 #include <QtGui/QColor>
 #include <QtGui/QMatrix4x4>
+#if VIDGFX_D3D_ENABLED
+#include <windows.h>
+#endif // VIDGFX_D3D_ENABLED
 
 // Export symbols from the DLL while allowing header file reuse by users
 #ifdef LIBVIDGFX_LIB
@@ -181,11 +195,13 @@ class GraphicsContext;
 class Texture;
 class VertexBuffer;
 class TexDecalVertBuf;
+class D3DContext;
 
 typedef GraphicsContext		VidgfxContext;
 typedef Texture				VidgfxTex;
 typedef VertexBuffer		VidgfxVertBuf;
 typedef TexDecalVertBuf		VidgfxTexDecalBuf;
+typedef D3DContext			VidgfxD3DContext;
 
 typedef GfxRenderTarget		VidgfxRendTarget;
 typedef GfxFilter			VidgfxFilter;
@@ -615,5 +631,87 @@ LVG_EXPORT void vidgfx_context_remove_destroying_callback(
 	VidgfxContext *context,
 	VidgfxContextDestroyingCallback *destroying,
 	void *opaque);
+
+//=============================================================================
+// D3DContext C API
+
+#if VIDGFX_D3D_ENABLED
+
+struct ID3D10Device;
+struct ID3D10Texture2D;
+struct IDXGIFactory1; // DXGI 1.1
+
+//-----------------------------------------------------------------------------
+// Static methods
+
+LVG_EXPORT HRESULT vidgfx_d3d_create_dxgifactory1_dyn(
+	IDXGIFactory1 **factory_out);
+LVG_EXPORT void vidgfx_d3d_log_display_adapters();
+
+//-----------------------------------------------------------------------------
+// Constructor/destructor
+
+LVG_EXPORT VidgfxD3DContext *vidgfx_d3dcontext_new();
+LVG_EXPORT void vidgfx_d3dcontext_destroy(
+	VidgfxD3DContext *context);
+
+LVG_EXPORT VidgfxD3DContext *vidgfx_context_get_d3dcontext(
+	VidgfxContext *context);
+LVG_EXPORT VidgfxContext *vidgfx_d3dcontext_get_context(
+	VidgfxD3DContext *context);
+
+//-----------------------------------------------------------------------------
+// Methods
+
+LVG_EXPORT bool vidgfx_d3dcontext_is_valid(
+	VidgfxD3DContext *context);
+
+LVG_EXPORT bool vidgfx_d3dcontext_init(
+	VidgfxD3DContext *context,
+	HWND hwnd,
+	const QSize &size,
+	const QColor &resize_border_col);
+LVG_EXPORT ID3D10Device *vidgfx_d3dcontext_get_device(
+	VidgfxD3DContext *context);
+LVG_EXPORT bool vidgfx_d3dcontext_has_dxgi11(
+	VidgfxD3DContext *context);
+LVG_EXPORT bool vidgfx_d3dcontext_has_bgra_tex_support(
+	VidgfxD3DContext *context);
+LVG_EXPORT VidgfxTex *vidgfx_d3dcontext_new_gdi_tex(
+	VidgfxD3DContext *context,
+	const QSize &size);
+LVG_EXPORT VidgfxTex *vidgfx_d3dcontext_open_shared_tex(
+	VidgfxD3DContext *context,
+	HANDLE shared_handle);
+LVG_EXPORT VidgfxTex *vidgfx_d3dcontext_open_dx10_tex(
+	VidgfxD3DContext *context,
+	ID3D10Texture2D *tex);
+
+//-----------------------------------------------------------------------------
+// Signals
+
+typedef void VidgfxD3DContextDxgi11ChangedCallback(
+	void *opaque, VidgfxD3DContext *context, bool has_dxgi11);
+typedef void VidgfxD3DContextBgraTexSupportChangedCallback(
+	void *opaque, VidgfxD3DContext *context, bool has_bgra_tex_support);
+
+LVG_EXPORT void vidgfx_d3dcontext_add_dxgi11_changed_callback(
+	VidgfxD3DContext *context,
+	VidgfxD3DContextDxgi11ChangedCallback *dxgi11_changed,
+	void *opaque);
+LVG_EXPORT void vidgfx_d3dcontext_remove_dxgi11_changed_callback(
+	VidgfxD3DContext *context,
+	VidgfxD3DContextDxgi11ChangedCallback *dxgi11_changed,
+	void *opaque);
+LVG_EXPORT void vidgfx_d3dcontext_add_bgra_tex_support_changed_callback(
+	VidgfxD3DContext *context,
+	VidgfxD3DContextBgraTexSupportChangedCallback *bgra_tex_support_changed,
+	void *opaque);
+LVG_EXPORT void vidgfx_d3dcontext_remove_bgra_tex_support_changed_callback(
+	VidgfxD3DContext *context,
+	VidgfxD3DContextBgraTexSupportChangedCallback *bgra_tex_support_changed,
+	void *opaque);
+
+#endif // VIDGFX_D3D_ENABLED
 
 #endif // LIBVIDGFX_H

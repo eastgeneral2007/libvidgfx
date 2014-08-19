@@ -132,6 +132,28 @@ class LVG_EXPORT D3DContext : public GraphicsContext
 {
 	Q_OBJECT
 
+private: // Datatypes ---------------------------------------------------------
+	struct Dxgi11ChangedCallback {
+		VidgfxD3DContextDxgi11ChangedCallback *	callback;
+		void *									opaque;
+
+		inline bool operator==(const Dxgi11ChangedCallback &r) const {
+			return callback == r.callback && opaque == r.opaque;
+		};
+	};
+	typedef QVector<Dxgi11ChangedCallback> Dxgi11ChangedCallbackList;
+
+	struct BgraTexSupportChangedCallback {
+		VidgfxD3DContextBgraTexSupportChangedCallback *	callback;
+		void *											opaque;
+
+		inline bool operator==(const BgraTexSupportChangedCallback &r) const {
+			return callback == r.callback && opaque == r.opaque;
+		};
+	};
+	typedef QVector<BgraTexSupportChangedCallback>
+		BgraTexSupportChangedCallbackList;
+
 private: // Members -----------------------------------------------------------
 	bool						m_hasDxgi11;
 	bool						m_hasDxgi11Valid;
@@ -192,6 +214,10 @@ private: // Members -----------------------------------------------------------
 
 	// Advanced rendering
 	VertexBuffer *				m_mipmapBuf;
+
+	// Callbacks
+	Dxgi11ChangedCallbackList			m_dxgi11ChangedCallbackList;
+	BgraTexSupportChangedCallbackList	m_bgraTexSupportChangedCallbackList;
 
 public: // Static methods -----------------------------------------------------
 	static HRESULT	createDXGIFactory1Dynamic(IDXGIFactory1 **factoryOut);
@@ -285,9 +311,24 @@ public: // Interface ----------------------------------------------------------
 	virtual void		drawBuffer(
 		VertexBuffer *buf, int numVertices = -1, int startVertex = 0);
 
+public: // Signals ------------------------------------------------------------
+	void	callDxgi11ChangedCallbacks(bool hasDxgi11);
+	void	addDxgi11ChangedCallback(
+		VidgfxD3DContextDxgi11ChangedCallback *dxgi11_changed, void *opaque);
+	void	removeDxgi11ChangedCallback(
+		VidgfxD3DContextDxgi11ChangedCallback *dxgi11_changed, void *opaque);
+
+	void	callBgraTexSupportChangedCallbacks(bool hasBgraTexSupport);
+	void	addBgraTexSupportChangedCallback(
+		VidgfxD3DContextBgraTexSupportChangedCallback *bgra_tex_support_changed,
+		void *opaque);
+	void	removeBgraTexSupportChangedCallback(
+		VidgfxD3DContextBgraTexSupportChangedCallback *bgra_tex_support_changed,
+		void *opaque);
+
 Q_SIGNALS: // Signals ---------------------------------------------------------
-	void			hasDxgi11Changed(bool hasDxgi11);
-	void			hasBgraTexSupportChanged(bool hasBgraTexSupport);
+	void	hasDxgi11Changed(bool hasDxgi11);
+	void	hasBgraTexSupportChanged(bool hasBgraTexSupport);
 };
 //=============================================================================
 
