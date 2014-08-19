@@ -196,12 +196,14 @@ class Texture;
 class VertexBuffer;
 class TexDecalVertBuf;
 class D3DContext;
+class D3DTexture;
 
 typedef GraphicsContext		VidgfxContext;
 typedef Texture				VidgfxTex;
 typedef VertexBuffer		VidgfxVertBuf;
 typedef TexDecalVertBuf		VidgfxTexDecalBuf;
 typedef D3DContext			VidgfxD3DContext;
+typedef D3DTexture			VidgfxD3DTex;
 
 typedef GfxRenderTarget		VidgfxRendTarget;
 typedef GfxFilter			VidgfxFilter;
@@ -631,6 +633,29 @@ LVG_EXPORT void vidgfx_context_remove_destroying_callback(
 	VidgfxContext *context,
 	VidgfxContextDestroyingCallback *destroying,
 	void *opaque);
+
+//=============================================================================
+// D3DTexture C API
+
+#if VIDGFX_D3D_ENABLED
+
+//-----------------------------------------------------------------------------
+// Constructor/destructor
+
+LVG_EXPORT VidgfxD3DTex *vidgfx_tex_get_d3dtex(
+	VidgfxTex *tex);
+LVG_EXPORT VidgfxTex *vidgfx_d3dtex_get_tex(
+	VidgfxD3DTex *tex);
+
+//-----------------------------------------------------------------------------
+// Methods
+
+LVG_EXPORT HDC vidgfx_d3dtex_get_dc(
+	VidgfxD3DTex *tex);
+LVG_EXPORT void vidgfx_d3dtex_release_dc(
+	VidgfxD3DTex *tex);
+
+#endif // VIDGFX_D3D_ENABLED
 
 //=============================================================================
 // D3DContext C API

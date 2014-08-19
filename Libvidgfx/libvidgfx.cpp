@@ -913,6 +913,47 @@ void vidgfx_context_remove_destroying_callback(
 }
 
 //=============================================================================
+// D3DTexture C API
+
+#if VIDGFX_D3D_ENABLED
+
+//-----------------------------------------------------------------------------
+// Constructor/destructor
+
+VidgfxD3DTex *vidgfx_tex_get_d3dtex(
+	VidgfxTex *tex)
+{
+	Texture *texture = static_cast<Texture *>(tex);
+	D3DTexture *d3dTex = static_cast<D3DTexture *>(texture);
+	return static_cast<VidgfxD3DTex *>(d3dTex);
+}
+
+VidgfxTex *vidgfx_d3dtex_get_tex(
+	VidgfxD3DTex *tex)
+{
+	D3DTexture *d3dTex = static_cast<D3DTexture *>(tex);
+	Texture *texture = static_cast<Texture *>(d3dTex);
+	return static_cast<VidgfxTex *>(texture);
+}
+
+//-----------------------------------------------------------------------------
+// Methods
+
+HDC vidgfx_d3dtex_get_dc(
+	VidgfxD3DTex *tex)
+{
+	return tex->getDC();
+}
+
+void vidgfx_d3dtex_release_dc(
+	VidgfxD3DTex *tex)
+{
+	tex->releaseDC();
+}
+
+#endif // VIDGFX_D3D_ENABLED
+
+//=============================================================================
 // D3DContext C API
 
 #if VIDGFX_D3D_ENABLED
