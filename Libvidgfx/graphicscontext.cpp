@@ -15,8 +15,8 @@
 // more details.
 //*****************************************************************************
 
-#include "include/graphicscontext.h"
-#include "include/gfxlog.h"
+#include "graphicscontext.h"
+#include "gfxlog.h"
 #include <QtGui/QImage>
 #include <QtGui/QVector2D>
 
@@ -1365,7 +1365,8 @@ void GraphicsContext::callInitializedCallbacks()
 {
 	for(int i = 0; i < m_initializedCallbackList.size(); i++) {
 		const InitializedCallback &callback = m_initializedCallbackList.at(i);
-		callback.callback(callback.opaque, this);
+		callback.callback(
+			callback.opaque, reinterpret_cast<VidgfxContext *>(this));
 	}
 }
 
@@ -1393,7 +1394,8 @@ void GraphicsContext::callDestroyingCallbacks()
 {
 	for(int i = 0; i < m_destroyingCallbackList.size(); i++) {
 		const DestroyingCallback &callback = m_destroyingCallbackList.at(i);
-		callback.callback(callback.opaque, this);
+		callback.callback(
+			callback.opaque, reinterpret_cast<VidgfxContext *>(this));
 	}
 }
 

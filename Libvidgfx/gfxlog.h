@@ -18,7 +18,7 @@
 #ifndef GFXLOG_H
 #define GFXLOG_H
 
-#include "libvidgfx.h"
+#include "include/libvidgfx.h"
 #include <QtCore/QVector>
 
 class GfxLogData;

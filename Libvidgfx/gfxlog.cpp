@@ -15,7 +15,7 @@
 // more details.
 //*****************************************************************************
 
-#include "include/gfxlog.h"
+#include "gfxlog.h"
 #include <QtCore/QRect>
 #include <QtCore/QRectF>
 #include <QtCore/QSize>

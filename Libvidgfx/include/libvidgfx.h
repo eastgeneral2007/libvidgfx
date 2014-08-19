@@ -197,19 +197,14 @@ LVG_EXPORT bool	initLibvidgfx_internal(
 //=============================================================================
 // C interface datatypes
 
-class GraphicsContext;
-class Texture;
-class VertexBuffer;
-class TexDecalVertBuf;
-class D3DContext;
-class D3DTexture;
-
-typedef GraphicsContext		VidgfxContext;
-typedef Texture				VidgfxTex;
-typedef VertexBuffer		VidgfxVertBuf;
-typedef TexDecalVertBuf		VidgfxTexDecalBuf;
-typedef D3DContext			VidgfxD3DContext;
-typedef D3DTexture			VidgfxD3DTex;
+#define DECLARE_OPAQUE(name) struct name { int unused; }
+DECLARE_OPAQUE(VidgfxContext);
+DECLARE_OPAQUE(VidgfxTex);
+DECLARE_OPAQUE(VidgfxVertBuf);
+DECLARE_OPAQUE(VidgfxTexDecalBuf);
+DECLARE_OPAQUE(VidgfxD3DContext);
+DECLARE_OPAQUE(VidgfxD3DTex);
+#undef DECLARE_OPAQUE
 
 typedef GfxRenderTarget		VidgfxRendTarget;
 typedef GfxFilter			VidgfxFilter;
@@ -279,7 +274,7 @@ LVG_EXPORT void vidgfx_texdecalbuf_destroy(
 LVG_EXPORT void vidgfx_texdecalbuf_set_context(
 	VidgfxTexDecalBuf *buf,
 	VidgfxContext *context);
-LVG_EXPORT VertexBuffer *vidgfx_texdecalbuf_get_vert_buf(
+LVG_EXPORT VidgfxVertBuf *vidgfx_texdecalbuf_get_vert_buf(
 	VidgfxTexDecalBuf *buf); // Applies settings
 LVG_EXPORT GfxTopology vidgfx_texdecalbuf_get_topology(
 	VidgfxTexDecalBuf *buf);

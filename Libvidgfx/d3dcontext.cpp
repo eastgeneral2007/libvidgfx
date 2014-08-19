@@ -15,10 +15,10 @@
 // more details.
 //*****************************************************************************
 
-#include "include/d3dcontext.h"
-#include "include/gfxlog.h"
-#include "include/versionhelpers.h"
+#include "d3dcontext.h"
+#include "gfxlog.h"
 #include "pciidparser.h"
+#include "versionhelpers.h"
 #include <d3d10_1.h>
 #include <QtCore/QFile>
 #include <QtGui/QImage>
@@ -2969,7 +2969,9 @@ void D3DContext::callDxgi11ChangedCallbacks(bool hasDxgi11)
 	for(int i = 0; i < m_dxgi11ChangedCallbackList.size(); i++) {
 		const Dxgi11ChangedCallback &callback =
 			m_dxgi11ChangedCallbackList.at(i);
-		callback.callback(callback.opaque, this, hasDxgi11);
+		callback.callback(
+			callback.opaque, reinterpret_cast<VidgfxD3DContext *>(this),
+			hasDxgi11);
 	}
 }
 
@@ -2998,7 +3000,9 @@ void D3DContext::callBgraTexSupportChangedCallbacks(bool hasBgraTexSupport)
 	for(int i = 0; i < m_bgraTexSupportChangedCallbackList.size(); i++) {
 		const BgraTexSupportChangedCallback &callback =
 			m_bgraTexSupportChangedCallbackList.at(i);
-		callback.callback(callback.opaque, this, hasBgraTexSupport);
+		callback.callback(
+			callback.opaque, reinterpret_cast<VidgfxD3DContext *>(this),
+			hasBgraTexSupport);
 	}
 }
 

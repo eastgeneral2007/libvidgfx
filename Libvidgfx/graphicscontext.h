@@ -18,7 +18,7 @@
 #ifndef GRAPHICSCONTEXT_H
 #define GRAPHICSCONTEXT_H
 
-#include "libvidgfx.h"
+#include "include/libvidgfx.h"
 #include <QtCore/QObject>
 #include <QtGui/QColor>
 #include <QtGui/QMatrix4x4>
