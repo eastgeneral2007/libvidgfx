@@ -17,6 +17,7 @@
 
 #include "include/libvidgfx.h"
 #include "include/d3dcontext.h"
+#include "include/gfxlog.h"
 #include <iostream>
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -102,6 +103,15 @@ bool initLibvidgfx_internal(int libVerMajor, int libVerMinor, int libVerPatch)
 	Q_INIT_RESOURCE(Libvidgfx);
 
 	return true;
+}
+
+//=============================================================================
+// GfxLog C interface
+
+void vidgfx_set_log_callback(
+	VidgfxLogCallback *callback)
+{
+	GfxLog::setCallback(callback);
 }
 
 //=============================================================================

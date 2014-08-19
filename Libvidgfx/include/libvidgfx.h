@@ -174,6 +174,12 @@ enum GfxOrientation {
 	GfxFlippedMirroredOrient
 };
 
+enum GfxLogLevel {
+	GfxNotice = 0,
+	GfxWarning,
+	GfxCritical
+};
+
 //=============================================================================
 // Library initialization
 
@@ -211,6 +217,15 @@ typedef GfxPixelFormat		VidgfxPixFormat;
 typedef GfxShader			VidgfxShader;
 typedef GfxTopology			VidgfxTopology;
 typedef GfxBlending			VidgfxBlending;
+
+//=============================================================================
+// GfxLog C interface
+
+typedef void VidgfxLogCallback(
+	const QString &cat, const QString &msg, GfxLogLevel lvl);
+
+LVG_EXPORT void vidgfx_set_log_callback(
+	VidgfxLogCallback *callback);
 
 //=============================================================================
 // VertexBuffer C interface

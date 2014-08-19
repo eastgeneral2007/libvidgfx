@@ -46,11 +46,11 @@ public: // Constructor/destructor ---------------------------------------------
 // GfxLog class
 
 static void defaultLog(
-	const QString &cat, const QString &msg, GfxLog::LogLevel lvl)
+	const QString &cat, const QString &msg, GfxLogLevel lvl)
 {
 	// No-op
 }
-GfxLog::CallbackFunc *GfxLog::s_callbackFunc = &defaultLog;
+VidgfxLogCallback *GfxLog::s_callbackFunc = &defaultLog;
 
 GfxLog::GfxLog()
 	: d(new GfxLogData())
@@ -72,7 +72,7 @@ GfxLog::~GfxLog()
 
 	// Forward to the callback
 	if(s_callbackFunc != NULL)
-		s_callbackFunc(d->cat, d->msg, d->lvl);
+		s_callbackFunc(d->cat, d->msg, (GfxLogLevel)(d->lvl));
 
 	delete d;
 }
