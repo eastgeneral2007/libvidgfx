@@ -15,8 +15,8 @@
 // more details.
 //*****************************************************************************
 
-#include "include/graphicscontext.h"
-#include "include/gfxlog.h"
+#include "graphicscontext.h"
+#include "gfxlog.h"
 #include <QtGui/QImage>
 #include <QtGui/QVector2D>
 
@@ -373,7 +373,7 @@ VertexBuffer *TexDecalVertBuf::getVertBuf()
 /// <summary>
 /// Returns the topology that the vertex buffer should be rendered with.
 /// </summary>
-GfxTopology TexDecalVertBuf::getTopology() const
+VidgfxTopology TexDecalVertBuf::getTopology() const
 {
 	if(m_hasScrolling)
 		return GfxTriangleListTopology;
@@ -456,7 +456,7 @@ void TexDecalVertBuf::setTextureUv(
 }
 
 void TexDecalVertBuf::setTextureUv(
-	const QRectF &normRect, GfxOrientation orient)
+	const QRectF &normRect, VidgfxOrientation orient)
 {
 	QPointF rectTl = normRect.topLeft();
 	QPointF rectBr = normRect.bottomRight();
@@ -691,7 +691,7 @@ int TexDecalVertBuf::writeScrollRect(
 /// <summary>
 /// WARNING: Create with `GraphicsContext::createTexture()` only!
 /// </summary>
-Texture::Texture(GfxTextureFlags flags, const QSize &size)
+Texture::Texture(VidgfxTexFlags flags, const QSize &size)
 	: m_flags(flags)
 	, m_mappedData(NULL)
 	, m_size(size)
@@ -762,6 +762,8 @@ GraphicsContext::GraphicsContext()
 	, m_texDecalModulate(255, 255, 255, 255)
 	//, m_texDecalEffects() // Done below
 	, m_texDecalConstantsDirty(false)
+	, m_initializedCallbackList()
+	, m_destroyingCallbackList()
 {
 	m_userTargets[0] = NULL;
 	m_userTargets[1] = NULL;
@@ -1357,4 +1359,62 @@ bool GraphicsContext::diluteImage(QImage &img) const
 	}
 
 	return true;
+}
+
+void GraphicsContext::callInitializedCallbacks()
+{
+	for(int i = 0; i < m_initializedCallbackList.size(); i++) {
+		const InitializedCallback &callback = m_initializedCallbackList.at(i);
+		callback.callback(
+			callback.opaque, reinterpret_cast<VidgfxContext *>(this));
+	}
+}
+
+void GraphicsContext::addInitializedCallback(
+	VidgfxContextInitializedCallback *initialized, void *opaque)
+{
+	InitializedCallback callback;
+	callback.callback = initialized;
+	callback.opaque = opaque;
+	m_initializedCallbackList.append(callback);
+}
+
+void GraphicsContext::removeInitializedCallback(
+	VidgfxContextInitializedCallback *initialized, void *opaque)
+{
+	InitializedCallback callback;
+	callback.callback = initialized;
+	callback.opaque = opaque;
+	int id = m_initializedCallbackList.indexOf(callback);
+	if(id >= 0)
+		m_initializedCallbackList.remove(id);
+}
+
+void GraphicsContext::callDestroyingCallbacks()
+{
+	for(int i = 0; i < m_destroyingCallbackList.size(); i++) {
+		const DestroyingCallback &callback = m_destroyingCallbackList.at(i);
+		callback.callback(
+			callback.opaque, reinterpret_cast<VidgfxContext *>(this));
+	}
+}
+
+void GraphicsContext::addDestroyingCallback(
+	VidgfxContextDestroyingCallback *destroying, void *opaque)
+{
+	DestroyingCallback callback;
+	callback.callback = destroying;
+	callback.opaque = opaque;
+	m_destroyingCallbackList.append(callback);
+}
+
+void GraphicsContext::removeDestroyingCallback(
+	VidgfxContextDestroyingCallback *destroying, void *opaque)
+{
+	DestroyingCallback callback;
+	callback.callback = destroying;
+	callback.opaque = opaque;
+	int id = m_destroyingCallbackList.indexOf(callback);
+	if(id >= 0)
+		m_destroyingCallbackList.remove(id);
 }

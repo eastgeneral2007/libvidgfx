@@ -18,7 +18,7 @@
 #ifndef GRAPHICSCONTEXT_H
 #define GRAPHICSCONTEXT_H
 
-#include "libvidgfx.h"
+#include "include/libvidgfx.h"
 #include <QtCore/QObject>
 #include <QtGui/QColor>
 #include <QtGui/QMatrix4x4>
@@ -32,7 +32,7 @@ class QSize;
 // having `map()` and `unmap()` methods instead of keeping a copy of the data
 // always in memory. However some functions such as `drawTextureRect()` rely
 // on the data being in memory as well.
-class LVG_EXPORT VertexBuffer
+class VertexBuffer
 {
 protected: // Members ---------------------------------------------------------
 	float *	m_data;
@@ -105,14 +105,14 @@ inline bool VertexBuffer::isDirty() const
 /// decal texture. It is up to the user to either call `deleteVertBuf()` or
 /// delete the whole object when the graphics context is released.
 /// </summary>
-class LVG_EXPORT TexDecalVertBuf
+class TexDecalVertBuf
 {
 private: // Constants ---------------------------------------------------------
 
 	// Buffer information for `createTexDecalRect()` (1 vertex = 8 floats)
-	static const int	ScrollRectNumVerts = 4 * 6; // 4 rects of 6 verts
-	static const int	ScrollRectNumFloats = ScrollRectNumVerts * 8;
-	static const int	ScrollRectBufSize = ScrollRectNumFloats * sizeof(float);
+	static const int	ScrollRectNumVerts = VIDGFX_SCROLL_RECT_NUM_VERTS;
+	static const int	ScrollRectNumFloats = VIDGFX_SCROLL_RECT_NUM_FLOATS;
+	static const int	ScrollRectBufSize = VIDGFX_SCROLL_RECT_BUF_SIZE;
 
 protected: // Members ---------------------------------------------------------
 	GraphicsContext *	m_context;
@@ -140,7 +140,7 @@ public: // Constructor/destructor ---------------------------------------------
 public: // Methods ------------------------------------------------------------
 	void			setContext(GraphicsContext *context);
 	VertexBuffer *	getVertBuf(); // Applies settings
-	GfxTopology		getTopology() const;
+	VidgfxTopology	getTopology() const;
 	void			deleteVertBuf();
 
 	// Position
@@ -159,10 +159,10 @@ public: // Methods ------------------------------------------------------------
 		const QPointF &topLeft, const QPointF &topRight,
 		const QPointF &botLeft, const QPointF &botRight);
 	void	setTextureUv(
-		const QRectF &normRect, GfxOrientation orient = GfxUnchangedOrient);
+		const QRectF &normRect, VidgfxOrientation orient = GfxUnchangedOrient);
 	void	setTextureUv(
 		const QPointF &topLeft, const QPointF &botRight,
-		GfxOrientation orient = GfxUnchangedOrient);
+		VidgfxOrientation orient = GfxUnchangedOrient);
 	void	getTextureUv(
 		QPointF *topLeft, QPointF *topRight, QPointF *botLeft,
 		QPointF *botRight) const;
@@ -196,23 +196,23 @@ inline bool TexDecalVertBuf::getRoundOffset() const
 }
 
 inline void TexDecalVertBuf::setTextureUv(
-	const QPointF &topLeft, const QPointF &botRight, GfxOrientation orient)
+	const QPointF &topLeft, const QPointF &botRight, VidgfxOrientation orient)
 {
 	setTextureUv(QRectF(topLeft, botRight), orient);
 }
 
 //=============================================================================
-class LVG_EXPORT Texture
+class Texture
 {
 protected: // Members ---------------------------------------------------------
 	bool			m_isValid;
-	GfxTextureFlags	m_flags;
+	VidgfxTexFlags	m_flags;
 	void *			m_mappedData;
 	QSize			m_size;
 	int				m_stride;
 
 protected: // Constructor/destructor ------------------------------------------
-	Texture(GfxTextureFlags flags, const QSize &size);
+	Texture(VidgfxTexFlags flags, const QSize &size);
 	virtual ~Texture();
 
 public: // Methods ------------------------------------------------------------
@@ -289,40 +289,61 @@ inline int Texture::getHeight() const
 }
 
 //=============================================================================
-class LVG_EXPORT GraphicsContext : public QObject
+class GraphicsContext : public QObject
 {
 	Q_OBJECT
+
+private: // Datatypes ---------------------------------------------------------
+	struct InitializedCallback {
+		VidgfxContextInitializedCallback *	callback;
+		void *								opaque;
+
+		inline bool operator==(const InitializedCallback &r) const {
+			return callback == r.callback && opaque == r.opaque;
+		};
+	};
+	typedef QVector<InitializedCallback> InitializedCallbackList;
+
+	struct DestroyingCallback {
+		VidgfxContextDestroyingCallback *	callback;
+		void *								opaque;
+
+		inline bool operator==(const DestroyingCallback &r) const {
+			return callback == r.callback && opaque == r.opaque;
+		};
+	};
+	typedef QVector<DestroyingCallback> DestroyingCallbackList;
 
 public: // Constants ----------------------------------------------------------
 
 	// The number of vertices required to represent one line
-	static const int	NumVertsPerLine = 6;
+	static const int	NumVertsPerLine = VIDGFX_NUM_VERTS_PER_LINE;
 
 	// The number of vertices required to represent one rectangle
-	static const int	NumVertsPerRect = 4 * NumVertsPerLine;
+	static const int	NumVertsPerRect = VIDGFX_NUM_VERTS_PER_RECT;
 
 	// Buffer information for `createSolidRect()` (1 vertex = 8 floats)
-	static const int	SolidRectNumVerts = 4;
-	static const int	SolidRectNumFloats = SolidRectNumVerts * 8;
-	static const int	SolidRectBufSize = SolidRectNumFloats * sizeof(float);
+	static const int	SolidRectNumVerts = VIDGFX_SOLID_RECT_NUM_VERTS;
+	static const int	SolidRectNumFloats = VIDGFX_SOLID_RECT_NUM_FLOATS;
+	static const int	SolidRectBufSize = VIDGFX_SOLID_RECT_BUF_SIZE;
 
 	// Buffer information for `createSolidRectOutline()` (1 vertex = 8 floats)
-	static const int	SolidRectOutlineNumVerts = NumVertsPerRect;
-	static const int	SolidRectOutlineNumFloats = SolidRectOutlineNumVerts * 8;
-	static const int	SolidRectOutlineBufSize = SolidRectOutlineNumFloats * sizeof(float);
+	static const int	SolidRectOutlineNumVerts = VIDGFX_SOLID_RECT_OUTLINE_NUM_VERTS;
+	static const int	SolidRectOutlineNumFloats = VIDGFX_SOLID_RECT_OUTLINE_NUM_FLOATS;
+	static const int	SolidRectOutlineBufSize = VIDGFX_SOLID_RECT_OUTLINE_BUF_SIZE;
 
 	// Buffer information for `createTexDecalRect()` (1 vertex = 8 floats)
-	static const int	TexDecalRectNumVerts = 4;
-	static const int	TexDecalRectNumFloats = TexDecalRectNumVerts * 8;
-	static const int	TexDecalRectBufSize = TexDecalRectNumFloats * sizeof(float);
+	static const int	TexDecalRectNumVerts = VIDGFX_TEX_DECAL_RECT_NUM_VERTS;
+	static const int	TexDecalRectNumFloats = VIDGFX_TEX_DECAL_RECT_NUM_FLOATS;
+	static const int	TexDecalRectBufSize = VIDGFX_TEX_DECAL_RECT_BUF_SIZE;
 
 	// Buffer information for `createResizeRect()` (1 vertex = 4 floats)
-	static const int	ResizeRectNumVerts = 10 * NumVertsPerRect;
-	static const int	ResizeRectNumFloats = ResizeRectNumVerts * 4;
-	static const int	ResizeRectBufSize = ResizeRectNumFloats * sizeof(float);
+	static const int	ResizeRectNumVerts = VIDGFX_RESIZE_RECT_NUM_VERTS;
+	static const int	ResizeRectNumFloats = VIDGFX_RESIZE_RECT_NUM_FLOATS;
+	static const int	ResizeRectBufSize = VIDGFX_RESIZE_RECT_BUF_SIZE;
 
 protected: // Members ---------------------------------------------------------
-	GfxRenderTarget	m_currentTarget;
+	VidgfxRendTarget	m_currentTarget;
 
 	QMatrix4x4		m_screenViewMat;
 	QMatrix4x4		m_screenProjMat;
@@ -346,6 +367,9 @@ protected: // Members ---------------------------------------------------------
 	QColor			m_texDecalModulate;
 	float			m_texDecalEffects[4]; // Gamma, brightness, contrast, saturation
 	bool			m_texDecalConstantsDirty;
+
+	InitializedCallbackList	m_initializedCallbackList;
+	DestroyingCallbackList	m_destroyingCallbackList;
 
 public: // Static methods -----------------------------------------------------
 	static bool		createSolidRect(
@@ -437,37 +461,50 @@ public: // Interface ----------------------------------------------------------
 		const QRect &srcRect) = 0;
 
 	// Render targets
-	virtual void			resizeScreenTarget(const QSize &newSize) = 0;
-	virtual void			resizeCanvasTarget(const QSize &newSize) = 0;
-	virtual void			resizeScratchTarget(const QSize &newSize) = 0;
-	virtual void			swapScreenBuffers() = 0;
-	virtual	Texture *		getTargetTexture(GfxRenderTarget target) = 0;
-	virtual GfxRenderTarget	getNextScratchTarget() = 0;
-	virtual QPointF			getScratchTargetToTextureRatio() = 0;
+	virtual void				resizeScreenTarget(const QSize &newSize) = 0;
+	virtual void				resizeCanvasTarget(const QSize &newSize) = 0;
+	virtual void				resizeScratchTarget(const QSize &newSize) = 0;
+	virtual void				swapScreenBuffers() = 0;
+	virtual	Texture *			getTargetTexture(VidgfxRendTarget target) = 0;
+	virtual VidgfxRendTarget	getNextScratchTarget() = 0;
+	virtual QPointF				getScratchTargetToTextureRatio() = 0;
 
 	// Advanced rendering
 	virtual Texture *	prepareTexture(
-		Texture *tex, const QSize &size, GfxFilter filter, bool setFilter,
+		Texture *tex, const QSize &size, VidgfxFilter filter, bool setFilter,
 		QPointF &pxSizeOut, QPointF &botRightOut) = 0;
 	virtual Texture *	prepareTexture(
 		Texture *tex, const QRect &cropRect, const QSize &size,
-		GfxFilter filter, bool setFilter, QPointF &pxSizeOut,
+		VidgfxFilter filter, bool setFilter, QPointF &pxSizeOut,
 		QPointF &topLeftOut, QPointF &botRightOut) = 0;
 	virtual Texture *	convertToBgrx(
-		GfxPixelFormat format, Texture *planeA, Texture *planeB,
+		VidgfxPixFormat format, Texture *planeA, Texture *planeB,
 		Texture *planeC) = 0;
 
 	// Drawing
-	virtual void		setRenderTarget(GfxRenderTarget target) = 0;
-	virtual void		setShader(GfxShader shader) = 0;
-	virtual void		setTopology(GfxTopology topology) = 0;
-	virtual void		setBlending(GfxBlending blending) = 0;
+	virtual void		setRenderTarget(VidgfxRendTarget target) = 0;
+	virtual void		setShader(VidgfxShader shader) = 0;
+	virtual void		setTopology(VidgfxTopology topology) = 0;
+	virtual void		setBlending(VidgfxBlending blending) = 0;
 	virtual void		setTexture(
 		Texture *texA, Texture *texB = NULL, Texture *texC = NULL) = 0;
-	virtual void		setTextureFilter(GfxFilter filter) = 0;
+	virtual void		setTextureFilter(VidgfxFilter filter) = 0;
 	virtual void		clear(const QColor &color) = 0;
 	virtual void		drawBuffer(
 		VertexBuffer *buf, int numVertices = -1, int startVertex = 0) = 0;
+
+public: // Signals ------------------------------------------------------------
+	void	callInitializedCallbacks();
+	void	addInitializedCallback(
+		VidgfxContextInitializedCallback *initialized, void *opaque);
+	void	removeInitializedCallback(
+		VidgfxContextInitializedCallback *initialized, void *opaque);
+
+	void	callDestroyingCallbacks();
+	void	addDestroyingCallback(
+		VidgfxContextDestroyingCallback *destroying, void *opaque);
+	void	removeDestroyingCallback(
+		VidgfxContextDestroyingCallback *destroying, void *opaque);
 
 Q_SIGNALS: // Signals ---------------------------------------------------------
 	void	initialized(GraphicsContext *gfx);

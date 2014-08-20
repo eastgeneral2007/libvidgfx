@@ -18,7 +18,7 @@
 #ifndef GFXLOG_H
 #define GFXLOG_H
 
-#include "libvidgfx.h"
+#include "include/libvidgfx.h"
 #include <QtCore/QVector>
 
 class GfxLogData;
@@ -39,17 +39,14 @@ public: // Datatypes ----------------------------------------------------------
 		Critical
 	};
 
-	typedef void CallbackFunc(
-		const QString &cat, const QString &msg, LogLevel lvl);
-
 protected: // Static members --------------------------------------------------
-	static CallbackFunc *	s_callbackFunc;
+	static VidgfxLogCallback *	s_callbackFunc;
 
 public: // Members ------------------------------------------------------------
 	GfxLogData *	d;
 
 public: // Static methods -----------------------------------------------------
-	LVG_EXPORT static void	setCallback(CallbackFunc *funcPtr);
+	static void	setCallback(VidgfxLogCallback *funcPtr);
 
 public: // Constructor/destructor ---------------------------------------------
 	GfxLog();
@@ -76,7 +73,7 @@ GfxLog gfxLog(const QString &category, GfxLog::LogLevel lvl = GfxLog::Notice);
 GfxLog gfxLog(GfxLog::LogLevel lvl = GfxLog::Notice);
 //=============================================================================
 
-inline void GfxLog::setCallback(CallbackFunc *funcPtr)
+inline void GfxLog::setCallback(VidgfxLogCallback *funcPtr)
 {
 	s_callbackFunc = funcPtr;
 }

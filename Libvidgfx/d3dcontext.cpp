@@ -15,10 +15,10 @@
 // more details.
 //*****************************************************************************
 
-#include "include/d3dcontext.h"
-#include "include/gfxlog.h"
-#include "include/versionhelpers.h"
+#include "d3dcontext.h"
+#include "gfxlog.h"
 #include "pciidparser.h"
+#include "versionhelpers.h"
 #include <d3d10_1.h>
 #include <QtCore/QFile>
 #include <QtGui/QImage>
@@ -321,7 +321,7 @@ void D3DVertexBuffer::bind()
 // D3DTexture class
 
 D3DTexture::D3DTexture(
-	D3DContext *context, GfxTextureFlags flags, const QSize &size,
+	D3DContext *context, VidgfxTexFlags flags, const QSize &size,
 	DXGI_FORMAT format, void *initialData, int stride)
 	: Texture(flags, size)
 	, m_tex(NULL)
@@ -815,6 +815,10 @@ D3DContext::D3DContext()
 
 	// Advanced rendering
 	, m_mipmapBuf(NULL)
+
+	// Callbacks
+	, m_dxgi11ChangedCallbackList()
+	, m_bgraTexSupportChangedCallbackList()
 {
 	memset(m_cameraConstantsLocal, 0, sizeof(m_cameraConstantsLocal));
 	memset(m_resizeConstantsLocal, 0, sizeof(m_resizeConstantsLocal));
@@ -830,6 +834,7 @@ D3DContext::~D3DContext()
 
 	// Emit destroyed signal so that other parts of the application can cleanly
 	// release their hardware resources
+	callDestroyingCallbacks();
 	emit destroying(this);
 
 	// Release advanced rendering objects
@@ -1365,6 +1370,7 @@ bool D3DContext::initialize(
 
 	// The context is now fully initialized and other parts of the application
 	// can begin to create hardware resources. Emit a signal so they know.
+	callInitializedCallbacks();
 	emit initialized(this);
 
 	return true;
@@ -1402,6 +1408,7 @@ bool D3DContext::hasDxgi11()
 	m_hasDxgi11Valid = true;
 
 	// Notify that the value has potentially changed
+	callDxgi11ChangedCallbacks(m_hasDxgi11);
 	emit hasDxgi11Changed(m_hasDxgi11);
 
 	// Test for BGRA texture support if we haven't done already in order for it
@@ -1442,6 +1449,7 @@ bool D3DContext::hasBgraTexSupport()
 #endif // FORCE_NO_BGRA_SUPPORT
 
 	// Notify that the value has potentially changed
+	callBgraTexSupportChangedCallbacks(m_hasBgraTexSupport);
 	emit hasBgraTexSupportChanged(m_hasBgraTexSupport);
 
 	return m_hasBgraTexSupport;
@@ -1826,7 +1834,7 @@ Texture *D3DContext::createTexture(QImage img, bool writable, bool targetable)
 		break;
 	}
 
-	GfxTextureFlags flags = 0;
+	VidgfxTexFlags flags = 0;
 	if(writable)
 		flags |= GfxWritableFlag;
 	if(targetable)
@@ -1856,7 +1864,7 @@ Texture *D3DContext::createTexture(
 {
 	if(size.isEmpty())
 		return NULL; // Cannot create empty textures
-	GfxTextureFlags flags = 0;
+	VidgfxTexFlags flags = 0;
 	if(writable)
 		flags |= GfxWritableFlag;
 	if(targetable)
@@ -1891,7 +1899,7 @@ Texture *D3DContext::createTexture(
 		return NULL; // Cannot create empty textures
 	if(sameFormat == NULL)
 		return NULL;
-	GfxTextureFlags flags = 0;
+	VidgfxTexFlags flags = 0;
 	if(writable)
 		flags |= GfxWritableFlag;
 	if(targetable)
@@ -2205,7 +2213,7 @@ void D3DContext::swapScreenBuffers()
 	m_swapChain->Present(0, 0);
 }
 
-Texture *D3DContext::getTargetTexture(GfxRenderTarget target)
+Texture *D3DContext::getTargetTexture(VidgfxRendTarget target)
 {
 	switch(target) {
 	default:
@@ -2228,9 +2236,9 @@ Texture *D3DContext::getTargetTexture(GfxRenderTarget target)
 /// Returns the next available scratch target so that it's possible to chain
 /// multiple scratch renders back-to-back.
 /// </summary>
-GfxRenderTarget D3DContext::getNextScratchTarget()
+VidgfxRendTarget D3DContext::getNextScratchTarget()
 {
-	GfxRenderTarget ret = GfxScratch1Target;
+	VidgfxRendTarget ret = GfxScratch1Target;
 	if(m_scratchNextTarget == 1)
 		ret = GfxScratch2Target;
 	m_scratchNextTarget ^= 1;
@@ -2258,7 +2266,7 @@ QPointF D3DContext::getScratchTargetToTextureRatio()
 // Advanced rendering
 
 Texture *D3DContext::prepareTexture(
-	Texture *tex, const QSize &size, GfxFilter filter, bool setFilter,
+	Texture *tex, const QSize &size, VidgfxFilter filter, bool setFilter,
 	QPointF &pxSizeOut, QPointF &botRightOut)
 {
 	// Even if the input is invalid still try to provide a sane output
@@ -2311,7 +2319,7 @@ Texture *D3DContext::prepareTexture(
 /// </summary>
 Texture *D3DContext::prepareTexture(
 	Texture *tex, const QRect &cropRect, const QSize &size,
-	GfxFilter filter, bool setFilter, QPointF &pxSizeOut,
+	VidgfxFilter filter, bool setFilter, QPointF &pxSizeOut,
 	QPointF &topLeftOut, QPointF &botRightOut)
 {
 	// Even if the input is invalid still try to provide a sane output
@@ -2332,7 +2340,7 @@ Texture *D3DContext::prepareTexture(
 	Texture *outTex = tex;
 
 	// Remember original state
-	GfxRenderTarget origTarget = m_currentTarget;
+	VidgfxRendTarget origTarget = m_currentTarget;
 
 	// TODO: Validate crop rectangle
 
@@ -2385,7 +2393,7 @@ Texture *D3DContext::prepareTexture(
 
 			// Setup render target
 			resizeScratchTarget(nextSize);
-			GfxRenderTarget target = getNextScratchTarget();
+			VidgfxRendTarget target = getNextScratchTarget();
 			setRenderTarget(target);
 			QMatrix4x4 mat;
 			setViewMatrix(mat);
@@ -2447,7 +2455,7 @@ Texture *D3DContext::prepareTexture(
 /// </summary>
 /// <returns>NULL if the texture could not be converted</returns>
 Texture *D3DContext::convertToBgrx(
-	GfxPixelFormat format, Texture *planeA, Texture *planeB, Texture *planeC)
+	VidgfxPixFormat format, Texture *planeA, Texture *planeB, Texture *planeC)
 {
 	if(format >= NUM_PIXEL_FORMAT_TYPES)
 		return NULL;
@@ -2490,7 +2498,7 @@ Texture *D3DContext::convertToBgrx(
 		//--------------------------------------------------------------------
 
 		// Remember original state
-		GfxRenderTarget origTarget = m_currentTarget;
+		VidgfxRendTarget origTarget = m_currentTarget;
 
 		// Update the vertex buffer. NOTE: We reuse the mipmapping buffer
 		createTexDecalRect(
@@ -2499,7 +2507,7 @@ Texture *D3DContext::convertToBgrx(
 
 		// Setup render target
 		resizeScratchTarget(outSize);
-		GfxRenderTarget target = getNextScratchTarget();
+		VidgfxRendTarget target = getNextScratchTarget();
 		setRenderTarget(target);
 		QMatrix4x4 mat;
 		setViewMatrix(mat);
@@ -2556,7 +2564,7 @@ Texture *D3DContext::convertToBgrx(
 		//--------------------------------------------------------------------
 
 		// Remember original state
-		GfxRenderTarget origTarget = m_currentTarget;
+		VidgfxRendTarget origTarget = m_currentTarget;
 
 		// Update the vertex buffer. NOTE: We reuse the mipmapping buffer
 		createTexDecalRect(
@@ -2565,7 +2573,7 @@ Texture *D3DContext::convertToBgrx(
 
 		// Setup render target
 		resizeScratchTarget(outSize);
-		GfxRenderTarget target = getNextScratchTarget();
+		VidgfxRendTarget target = getNextScratchTarget();
 		setRenderTarget(target);
 		QMatrix4x4 mat;
 		setViewMatrix(mat);
@@ -2623,7 +2631,7 @@ Texture *D3DContext::convertToBgrx(
 //-----------------------------------------------------------------------------
 // Drawing
 
-void D3DContext::setRenderTarget(GfxRenderTarget target)
+void D3DContext::setRenderTarget(VidgfxRendTarget target)
 {
 	if(!isValid())
 		return; // DirectX must be initialized
@@ -2697,7 +2705,7 @@ void D3DContext::setRenderTarget(GfxRenderTarget target)
 	m_cameraConstantsDirty = true;
 }
 
-void D3DContext::setShader(GfxShader shader)
+void D3DContext::setShader(VidgfxShader shader)
 {
 	if(!isValid())
 		return; // DirectX must be initialized
@@ -2765,7 +2773,7 @@ void D3DContext::setShader(GfxShader shader)
 	m_boundShader = shader;
 }
 
-void D3DContext::setTopology(GfxTopology topology)
+void D3DContext::setTopology(VidgfxTopology topology)
 {
 	if(!isValid())
 		return; // DirectX must be initialized
@@ -2783,7 +2791,7 @@ void D3DContext::setTopology(GfxTopology topology)
 	}
 }
 
-void D3DContext::setBlending(GfxBlending blending)
+void D3DContext::setBlending(VidgfxBlending blending)
 {
 	if(!isValid())
 		return; // DirectX must be initialized
@@ -2835,7 +2843,7 @@ void D3DContext::setTexture(Texture *texA, Texture *texB, Texture *texC)
 	setSwizzleInTexDecal(textureA->doBgraSwizzle());
 }
 
-void D3DContext::setTextureFilter(GfxFilter filter)
+void D3DContext::setTextureFilter(VidgfxFilter filter)
 {
 	if(!isValid())
 		return; // DirectX must be initialized
@@ -2954,4 +2962,68 @@ void D3DContext::drawBuffer(
 
 	// Actually send the draw command
 	m_device->Draw(numVertices, startVertex);
+}
+
+void D3DContext::callDxgi11ChangedCallbacks(bool hasDxgi11)
+{
+	for(int i = 0; i < m_dxgi11ChangedCallbackList.size(); i++) {
+		const Dxgi11ChangedCallback &callback =
+			m_dxgi11ChangedCallbackList.at(i);
+		callback.callback(
+			callback.opaque, reinterpret_cast<VidgfxD3DContext *>(this),
+			hasDxgi11);
+	}
+}
+
+void D3DContext::addDxgi11ChangedCallback(
+	VidgfxD3DContextDxgi11ChangedCallback *dxgi11_changed, void *opaque)
+{
+	Dxgi11ChangedCallback callback;
+	callback.callback = dxgi11_changed;
+	callback.opaque = opaque;
+	m_dxgi11ChangedCallbackList.append(callback);
+}
+
+void D3DContext::removeDxgi11ChangedCallback(
+	VidgfxD3DContextDxgi11ChangedCallback *dxgi11_changed, void *opaque)
+{
+	Dxgi11ChangedCallback callback;
+	callback.callback = dxgi11_changed;
+	callback.opaque = opaque;
+	int id = m_dxgi11ChangedCallbackList.indexOf(callback);
+	if(id >= 0)
+		m_dxgi11ChangedCallbackList.remove(id);
+}
+
+void D3DContext::callBgraTexSupportChangedCallbacks(bool hasBgraTexSupport)
+{
+	for(int i = 0; i < m_bgraTexSupportChangedCallbackList.size(); i++) {
+		const BgraTexSupportChangedCallback &callback =
+			m_bgraTexSupportChangedCallbackList.at(i);
+		callback.callback(
+			callback.opaque, reinterpret_cast<VidgfxD3DContext *>(this),
+			hasBgraTexSupport);
+	}
+}
+
+void D3DContext::addBgraTexSupportChangedCallback(
+	VidgfxD3DContextBgraTexSupportChangedCallback *bgra_tex_support_changed,
+	void *opaque)
+{
+	BgraTexSupportChangedCallback callback;
+	callback.callback = bgra_tex_support_changed;
+	callback.opaque = opaque;
+	m_bgraTexSupportChangedCallbackList.append(callback);
+}
+
+void D3DContext::removeBgraTexSupportChangedCallback(
+	VidgfxD3DContextBgraTexSupportChangedCallback *bgra_tex_support_changed,
+	void *opaque)
+{
+	BgraTexSupportChangedCallback callback;
+	callback.callback = bgra_tex_support_changed;
+	callback.opaque = opaque;
+	int id = m_bgraTexSupportChangedCallbackList.indexOf(callback);
+	if(id >= 0)
+		m_bgraTexSupportChangedCallbackList.remove(id);
 }
