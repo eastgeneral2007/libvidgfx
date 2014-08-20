@@ -37,8 +37,12 @@
 #include <windows.h>
 #endif // VIDGFX_D3D_ENABLED
 
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
+
 // Export symbols from the DLL while allowing header file reuse by users
-#ifdef LIBVIDGFX_LIB
+#ifdef VIDGFX_LIB
 #define API_EXPORT Q_DECL_EXPORT
 #else
 #define API_EXPORT Q_DECL_IMPORT
@@ -49,10 +53,10 @@
 
 // Library version. NOTE: Don't forget to update the values in the resource
 // files as well ("Libvidgfx.rc")
-#define LIBVIDGFX_VER_STR "v0.6.0"
-#define LIBVIDGFX_VER_MAJOR 0
-#define LIBVIDGFX_VER_MINOR 6
-#define LIBVIDGFX_VER_BUILD 0
+#define VIDGFX_VER_STR "v0.6.0"
+#define VIDGFX_VER_MAJOR 0
+#define VIDGFX_VER_MINOR 6
+#define VIDGFX_VER_PATCH 0
 
 //=============================================================================
 // Enumerations
@@ -96,7 +100,7 @@ enum VidgfxPixFormat {
 
 	NUM_PIXEL_FORMAT_TYPES // Must be last
 };
-static const char * const VidgfxPixFormatStrings[] = {
+static const char * const VidgfxPixFormatStrs[] = {
 	"Unknown",
 
 	// Uncompressed RGB with a single packed plane
@@ -142,12 +146,12 @@ enum VidgfxFilter {
 	// Special internal filters
 	GfxResizeLayerFilter = NUM_STANDARD_TEXTURE_FILTERS
 };
-static const char * const VidgfxFilterStrings[] = {
+static const char * const VidgfxFilterStrs[] = {
 	"Nearest neighbour",
 	"Bilinear",
 	//"Bicubic",
 };
-static const char * const VidgfxFilterQualityStrings[] = {
+static const char * const VidgfxFilterQualStrs[] = {
 	"Low (Nearest neighbour)",
 	"Medium (Bilinear)",
 	//"High (Bicubic)",
@@ -159,40 +163,26 @@ enum VidgfxBlending {
 	GfxPremultipliedBlending
 };
 
-typedef int GfxTextureFlags;
-enum GfxTextureFlags_ {
+typedef int VidgfxTexFlags;
+enum VidgfxTexFlags_ {
 	GfxWritableFlag = (1 << 0),
 	GfxTargetableFlag = (1 << 1),
 	GfxStagingFlag = (1 << 2),
 	GfxGDIFlag = (1 << 3) // Used by `D3DContext` only
 };
 
-enum GfxOrientation {
+enum VidgfxOrientation {
 	GfxUnchangedOrient = 0,
 	GfxFlippedOrient,
 	GfxMirroredOrient,
 	GfxFlippedMirroredOrient
 };
 
-enum GfxLogLevel {
+enum VidgfxLogLvl {
 	GfxNotice = 0,
 	GfxWarning,
 	GfxCritical
 };
-
-//=============================================================================
-// Library initialization
-
-API_EXPORT bool	initLibvidgfx_internal(
-	int libVerMajor, int libVerMinor, int libVerPatch);
-
-/// <summary>
-/// Initializes Libvidgfx. Must be called as the very first thing in `main()`.
-/// </summary>
-#define INIT_LIBVIDGFX() \
-	if(!initLibvidgfx_internal( \
-	LIBVIDGFX_VER_MAJOR, LIBVIDGFX_VER_MINOR, LIBVIDGFX_VER_BUILD)) \
-	return 1
 
 //=============================================================================
 // C interface datatypes
@@ -207,10 +197,24 @@ DECLARE_OPAQUE(VidgfxD3DTex);
 #undef DECLARE_OPAQUE
 
 //=============================================================================
+// Library initialization
+
+API_EXPORT bool	vidgfx_init__(
+	int libVerMajor, int libVerMinor, int libVerPatch);
+
+/// <summary>
+/// Initializes Libvidgfx. Must be called as the very first thing in `main()`.
+/// </summary>
+#define vidgfx_init() \
+	if(!vidgfx_init__( \
+	VIDGFX_VER_MAJOR, VIDGFX_VER_MINOR, VIDGFX_VER_PATCH)) \
+	return 1
+
+//=============================================================================
 // GfxLog C interface
 
 typedef void VidgfxLogCallback(
-	const QString &cat, const QString &msg, GfxLogLevel lvl);
+	const QString &cat, const QString &msg, VidgfxLogLvl lvl);
 
 API_EXPORT void vidgfx_set_log_callback(
 	VidgfxLogCallback *callback);
@@ -307,12 +311,12 @@ API_EXPORT void vidgfx_texdecalbuf_set_tex_uv(
 API_EXPORT void vidgfx_texdecalbuf_set_tex_uv(
 	VidgfxTexDecalBuf *buf,
 	const QRectF &norm_rect,
-	GfxOrientation orient = GfxUnchangedOrient);
+	VidgfxOrientation orient = GfxUnchangedOrient);
 API_EXPORT void vidgfx_texdecalbuf_set_tex_uv(
 	VidgfxTexDecalBuf *buf,
 	const QPointF &top_left,
 	const QPointF &bot_right,
-	GfxOrientation orient = GfxUnchangedOrient);
+	VidgfxOrientation orient = GfxUnchangedOrient);
 API_EXPORT void vidgfx_texdecalbuf_get_tex_uv(
 	VidgfxTexDecalBuf *buf,
 	QPointF *top_left,
@@ -781,5 +785,9 @@ API_EXPORT void vidgfx_d3dcontext_remove_bgra_tex_support_changed_callback(
 #endif // VIDGFX_D3D_ENABLED
 
 #undef API_EXPORT
+
+//#ifdef __cplusplus
+//}
+//#endif
 
 #endif // LIBVIDGFX_H

@@ -81,7 +81,7 @@ protected: // Members ---------------------------------------------------------
 
 public: // Constructor/destructor ---------------------------------------------
 	D3DTexture(
-		D3DContext *context, GfxTextureFlags flags, const QSize &size,
+		D3DContext *context, VidgfxTexFlags flags, const QSize &size,
 		DXGI_FORMAT format, void *initialData = NULL, int stride = 0);
 	D3DTexture(D3DContext *context, ID3D10Texture2D *tex);
 	virtual ~D3DTexture();

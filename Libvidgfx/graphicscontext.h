@@ -159,10 +159,10 @@ public: // Methods ------------------------------------------------------------
 		const QPointF &topLeft, const QPointF &topRight,
 		const QPointF &botLeft, const QPointF &botRight);
 	void	setTextureUv(
-		const QRectF &normRect, GfxOrientation orient = GfxUnchangedOrient);
+		const QRectF &normRect, VidgfxOrientation orient = GfxUnchangedOrient);
 	void	setTextureUv(
 		const QPointF &topLeft, const QPointF &botRight,
-		GfxOrientation orient = GfxUnchangedOrient);
+		VidgfxOrientation orient = GfxUnchangedOrient);
 	void	getTextureUv(
 		QPointF *topLeft, QPointF *topRight, QPointF *botLeft,
 		QPointF *botRight) const;
@@ -196,7 +196,7 @@ inline bool TexDecalVertBuf::getRoundOffset() const
 }
 
 inline void TexDecalVertBuf::setTextureUv(
-	const QPointF &topLeft, const QPointF &botRight, GfxOrientation orient)
+	const QPointF &topLeft, const QPointF &botRight, VidgfxOrientation orient)
 {
 	setTextureUv(QRectF(topLeft, botRight), orient);
 }
@@ -206,13 +206,13 @@ class Texture
 {
 protected: // Members ---------------------------------------------------------
 	bool			m_isValid;
-	GfxTextureFlags	m_flags;
+	VidgfxTexFlags	m_flags;
 	void *			m_mappedData;
 	QSize			m_size;
 	int				m_stride;
 
 protected: // Constructor/destructor ------------------------------------------
-	Texture(GfxTextureFlags flags, const QSize &size);
+	Texture(VidgfxTexFlags flags, const QSize &size);
 	virtual ~Texture();
 
 public: // Methods ------------------------------------------------------------

@@ -66,7 +66,7 @@ static void showBasicErrorMessageBox(
 //=============================================================================
 // Library initialization
 
-bool initLibvidgfx_internal(int libVerMajor, int libVerMinor, int libVerPatch)
+bool vidgfx_init__(int libVerMajor, int libVerMinor, int libVerPatch)
 {
 	static bool inited = false;
 	if(inited)
@@ -75,9 +75,9 @@ bool initLibvidgfx_internal(int libVerMajor, int libVerMinor, int libVerPatch)
 
 	// Test Libvidgfx version. TODO: When the API is stable we should not test
 	// to see if the patch version is the same
-	if(libVerMajor != LIBVIDGFX_VER_MAJOR ||
-		libVerMinor != LIBVIDGFX_VER_MINOR ||
-		libVerPatch != LIBVIDGFX_VER_BUILD)
+	if(libVerMajor != VIDGFX_VER_MAJOR ||
+		libVerMinor != VIDGFX_VER_MINOR ||
+		libVerPatch != VIDGFX_VER_PATCH)
 	{
 		QString msg = QStringLiteral("Fatal: Mismatched Libvidgfx version!");
 
@@ -306,7 +306,7 @@ void vidgfx_texdecalbuf_set_tex_uv(
 void vidgfx_texdecalbuf_set_tex_uv(
 	VidgfxTexDecalBuf *buf,
 	const QRectF &norm_rect,
-	GfxOrientation orient)
+	VidgfxOrientation orient)
 {
 	TexDecalVertBuf *ptr = reinterpret_cast<TexDecalVertBuf *>(buf);
 	ptr->setTextureUv(norm_rect, orient);
@@ -316,7 +316,7 @@ void vidgfx_texdecalbuf_set_tex_uv(
 	VidgfxTexDecalBuf *buf,
 	const QPointF &top_left,
 	const QPointF &bot_right,
-	GfxOrientation orient)
+	VidgfxOrientation orient)
 {
 	TexDecalVertBuf *ptr = reinterpret_cast<TexDecalVertBuf *>(buf);
 	ptr->setTextureUv(top_left, bot_right, orient);

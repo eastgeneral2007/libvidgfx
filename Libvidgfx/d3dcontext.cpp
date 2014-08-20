@@ -321,7 +321,7 @@ void D3DVertexBuffer::bind()
 // D3DTexture class
 
 D3DTexture::D3DTexture(
-	D3DContext *context, GfxTextureFlags flags, const QSize &size,
+	D3DContext *context, VidgfxTexFlags flags, const QSize &size,
 	DXGI_FORMAT format, void *initialData, int stride)
 	: Texture(flags, size)
 	, m_tex(NULL)
@@ -1834,7 +1834,7 @@ Texture *D3DContext::createTexture(QImage img, bool writable, bool targetable)
 		break;
 	}
 
-	GfxTextureFlags flags = 0;
+	VidgfxTexFlags flags = 0;
 	if(writable)
 		flags |= GfxWritableFlag;
 	if(targetable)
@@ -1864,7 +1864,7 @@ Texture *D3DContext::createTexture(
 {
 	if(size.isEmpty())
 		return NULL; // Cannot create empty textures
-	GfxTextureFlags flags = 0;
+	VidgfxTexFlags flags = 0;
 	if(writable)
 		flags |= GfxWritableFlag;
 	if(targetable)
@@ -1899,7 +1899,7 @@ Texture *D3DContext::createTexture(
 		return NULL; // Cannot create empty textures
 	if(sameFormat == NULL)
 		return NULL;
-	GfxTextureFlags flags = 0;
+	VidgfxTexFlags flags = 0;
 	if(writable)
 		flags |= GfxWritableFlag;
 	if(targetable)

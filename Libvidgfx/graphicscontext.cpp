@@ -456,7 +456,7 @@ void TexDecalVertBuf::setTextureUv(
 }
 
 void TexDecalVertBuf::setTextureUv(
-	const QRectF &normRect, GfxOrientation orient)
+	const QRectF &normRect, VidgfxOrientation orient)
 {
 	QPointF rectTl = normRect.topLeft();
 	QPointF rectBr = normRect.bottomRight();
@@ -691,7 +691,7 @@ int TexDecalVertBuf::writeScrollRect(
 /// <summary>
 /// WARNING: Create with `GraphicsContext::createTexture()` only!
 /// </summary>
-Texture::Texture(GfxTextureFlags flags, const QSize &size)
+Texture::Texture(VidgfxTexFlags flags, const QSize &size)
 	: m_flags(flags)
 	, m_mappedData(NULL)
 	, m_size(size)
